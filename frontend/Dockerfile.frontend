@@ -2,18 +2,21 @@
 FROM node:18-alpine AS build
 WORKDIR /app
 
-# Copy package files and install
+# Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+
+# Force a clean installation while handling peer dependencies properly
+RUN npm ci --legacy-peer-deps
 
 # Copy all source code
 COPY . .
 
-# Build for production (Vite typically outputs to /dist)
-RUN npm run build --legacy-peer-deps
+# Force rebuild and clean cache before production build
+RUN rm -rf node_modules/.cache && npm run build --legacy-peer-deps
 
 # ============ Stage 2: Serve the built files via Nginx ============
 FROM nginx:alpine
+
 # Remove default website
 RUN rm -rf /usr/share/nginx/html/*
 
@@ -24,4 +27,4 @@ COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
 
 # Run Nginx in foreground
-CMD ["nginx","-g","daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
