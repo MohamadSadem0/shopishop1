@@ -1,0 +1,8 @@
+build:
+  docker:
+    web: Dockerfile
+release:
+  command:
+    - echo "Release phase complete"
+run:
+  web: java -jar /app/app.jar
