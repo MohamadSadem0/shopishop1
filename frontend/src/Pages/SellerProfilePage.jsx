@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import SellerProfileSideBar from "../Components/Layout/Dashboard/SellerProfilePage/SellerProfileSideBar";
-import SellerProfileData from "../Components/Layout/Dashboard/SellerProfilePage/SellerProfileData";
+// import SellerProfileData from "../Components/Layout/Dashboard/SellerProfilePage/SellerProfileData";
 import styles from "../Styles/Style";
 
 const SellerProfilePage = () => {
@@ -18,7 +18,7 @@ const SellerProfilePage = () => {
             <SellerProfileSideBar isOwner={true} />
           </div>
           <div className="w-full 800px:w-[72%] rounded-[4px] mt-10 800px:mt-0">
-            <SellerProfileData isOwner={true} />
+            {/* <SellerProfileData isOwner={true} /> */}
           </div>
         </div>
       </div>
