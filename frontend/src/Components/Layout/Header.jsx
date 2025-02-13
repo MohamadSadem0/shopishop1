@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSectionsWithCategories } from "../../Redux/slices/sectionSlice";
 import styles from "../../Styles/Style";
-import Logo from "../../assets/logo.png";
 import avatar from "../../assets/avatar.jpg";
 import {
   AiOutlineHeart,
@@ -93,7 +92,7 @@ const Header = ({ activeHeading }) => {
         <div className="hidden 800px:h-[50px] 800px:pt-12 800px:pb-12 800px:flex items-center justify-between">
           {/* Logo */}
           <Link to="/">
-            <img src={Logo} alt="Logo" className="w-[150px] h-[120px]" />
+            <img src={"https://res.cloudinary.com/dctv1qmij/image/upload/v1739464039/rih9vuuuyyndshhijwyh.png"} alt="Logo" className="w-[150px] h-[120px]" />
           </Link>
 
           {/* Search Box */}

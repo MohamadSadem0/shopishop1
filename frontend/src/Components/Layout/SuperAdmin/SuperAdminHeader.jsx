@@ -1,6 +1,5 @@
   import React from "react";
   import { Link } from "react-router-dom";
-  import Logo from "../../../assets/logo.png";
   import avatar from "../../../assets/avatar.jpg";
   import { AiOutlineUser } from "react-icons/ai";
   import { FiUsers, FiSettings } from "react-icons/fi";
@@ -17,7 +16,7 @@
       <div className="w-full h-[80px] bg-white shadow-md sticky top-0 left-0 flex items-center justify-between px-4 z-50">
         {/* Logo */}
         <Link to={"/superadmin-dashboard"}>
-          <img src={Logo} alt="Logo" className="w-[150px] h-[120px]" />
+          <img src={"https://res.cloudinary.com/dctv1qmij/image/upload/v1739464039/rih9vuuuyyndshhijwyh.png"} alt="Logo" className="w-[150px] h-[120px]" />
         </Link>
 
         {/* Quick Access Icons */}

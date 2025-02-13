@@ -1,6 +1,5 @@
 import React from "react";
 
-import logo from "../../Assets/logo.png";
 
 import {
   AiOutlineTwitter,
@@ -47,7 +46,7 @@ const Footer = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:px-8 px-5 py-16 sm:text-center">
         <ul className="flex flex-col sm:block px-5 text-center sm:text-start items-center">
           <img
-            src={logo}
+            src={"https://res.cloudinary.com/dctv1qmij/image/upload/v1739464039/rih9vuuuyyndshhijwyh.png"}
             alt="logo/image"
             className="w-[40%] 800px:w-[60%] "
             style={{ filter: "brightness(0) invert(1)" }}
