@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BiMenuAltLeft } from "react-icons/bi";
-import Logo from "../../../assets/logo.png";
+import Logo from "../../../Assets/logo.png";
 import { Link } from "react-router-dom";
 import {
   AiOutlineHeart,
