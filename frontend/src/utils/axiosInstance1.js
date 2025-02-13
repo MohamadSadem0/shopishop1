@@ -1,7 +1,7 @@
 // src/services/axiosInstance.js
 // src/services/axiosInstance.js
 import axios from "axios";
-import store from "../redux/store";  // <-- import your Redux store
+import store from "../redux/Store";  // <-- import your Redux store
 
 const instance = axios.create({
   baseURL: "http://localhost:8080", // or your actual base URL
