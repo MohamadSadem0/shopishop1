@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSectionsWithCategories } from "../../redux/slices/sectionSlice";
 import styles from "../../Styles/Style";
-import avatar from "../../assets/avatar.jpg";
 import {
   AiOutlineHeart,
   AiOutlineSearch,
@@ -38,7 +37,7 @@ const Header = ({ activeHeading }) => {
   const { cart } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
   const { user, role } = useSelector((state) => state.auth);
-  const profile = user?.photoUrl || avatar;
+  const profile = user?.photoUrl || "https://res.cloudinary.com/dctv1qmij/image/upload/v1739468479/ydkvpj0djknabhmgb17j.jpg";
 
   // Decide which link & button text (Login, Dashboard, etc.)
   const { dashboardRoute, buttonText } = (() => {

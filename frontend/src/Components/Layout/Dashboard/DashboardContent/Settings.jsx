@@ -5,7 +5,6 @@ import { AiOutlineCamera } from "react-icons/ai";
 
 import { motion } from "framer-motion";
 
-import avatar from "../../../../assets/avatar.jpg";
 
 const Settings = () => {
   // getting seller old info form local storage
@@ -61,7 +60,7 @@ const Settings = () => {
       <div className="flex justify-center w-full">
         <div className="relative h-[150px]">
           <img
-            src={photoUrl ? photoUrl : shopLogo ? shopLogo : avatar}
+            src={photoUrl ? photoUrl : shopLogo ? shopLogo : "https://res.cloudinary.com/dctv1qmij/image/upload/v1739468479/ydkvpj0djknabhmgb17j.jpg"}
             alt="profile/image"
             className="w-[150px] h-[150px] object-cover rounded-full border-[3px] border-[#3957db]"
           />

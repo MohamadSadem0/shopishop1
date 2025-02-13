@@ -1,6 +1,5 @@
 import React from "react";
 
-import avatar from "../../../../Assets/avatar.jpg";
 import styles from "../../../../Styles/Style";
 import { Link } from "react-router-dom";
 
@@ -16,7 +15,7 @@ const SellerProfileSideBar = ({ isOwner }) => {
       <div className="w-full py-5">
         <div className="flex items-center justify-center w-full">
           <img
-            src={photoUrl ? photoUrl : avatar}
+            src={photoUrl ? photoUrl : "https://res.cloudinary.com/dctv1qmij/image/upload/v1739468479/ydkvpj0djknabhmgb17j.jpg"}
             alt="seller/image"
             title="Profile"
             className="800px:w-[150px] 800px:h-[150px] w-[120px] h-[120px] object-cover cursor-pointer border border-[#3957db] rounded-full"

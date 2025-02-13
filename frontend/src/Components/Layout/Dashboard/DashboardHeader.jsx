@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import avatar from "../../../assets/avatar.jpg";
 import { AiOutlineGift } from "react-icons/ai";
 import { MdOutlineLocalOffer } from "react-icons/md";
 import { FiPackage, FiShoppingBag } from "react-icons/fi";
@@ -76,7 +75,7 @@ const DashboardHeader = () => {
 
           <Link to={`/profile`}>
             <img
-              src={photoUrl ? photoUrl : avatar}
+              src={photoUrl ? photoUrl : "https://res.cloudinary.com/dctv1qmij/image/upload/v1739468479/ydkvpj0djknabhmgb17j.jpg"}
               alt="seller/image"
               title="Profile"
               className="w-[50px] h-[50px] object-cover cursor-pointer border border-[#3957db] rounded-full mr-3"

@@ -1,6 +1,5 @@
   import React from "react";
   import { Link } from "react-router-dom";
-  import avatar from "../../../assets/avatar.jpg";
   import { AiOutlineUser } from "react-icons/ai";
   import { FiUsers, FiSettings } from "react-icons/fi";
   import { MdOutlineCategory, MdOutlineDashboard } from "react-icons/md";
@@ -9,7 +8,7 @@
 
   const SuperAdminHeader = () => {
     const superAdminInfo = JSON.parse(localStorage.getItem("superAdminInfo"));
-    const photoUrl = superAdminInfo?.photoUrl || avatar;
+    const photoUrl = superAdminInfo?.photoUrl || "https://res.cloudinary.com/dctv1qmij/image/upload/v1739468479/ydkvpj0djknabhmgb17j.jpg";
     const superAdminId = JSON.parse(localStorage.getItem("superAdminId"));
 
     return (

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import avatar from "../../../assets/avatar.jpg";
 import { AiOutlineCamera } from "react-icons/ai";
 import styles from "../../../Styles/Style";
 import { motion } from "framer-motion";
@@ -61,7 +60,7 @@ const Profile = ({ setViewProfile }) => {
         <div className="relative h-[150px]">
           <div className="relative h-[150px]">
             <img
-              src={photoUrl ? photoUrl : profileLogo ? profileLogo : avatar}
+              src={photoUrl ? photoUrl : profileLogo ? profileLogo : "https://res.cloudinary.com/dctv1qmij/image/upload/v1739468479/ydkvpj0djknabhmgb17j.jpg"}
               alt="profile/image"
               className="w-[150px] h-[150px] object-cover rounded-full border-[3px] border-[#3957db]"
               onClick={() => setViewProfile(true)}

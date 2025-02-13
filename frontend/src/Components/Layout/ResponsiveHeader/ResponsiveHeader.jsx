@@ -10,7 +10,6 @@ import { RxCross1 } from "react-icons/rx";
 import styles from "../../../Styles/Style";
 import Navbar from "../Navbar";
 import { IoIosArrowForward } from "react-icons/io";
-import avatar from "../../../assets/avatar.jpg";
 import Cart from "../../Cart";
 import Wishlist from "../../Wishlist";
 import { useSelector } from "react-redux";
