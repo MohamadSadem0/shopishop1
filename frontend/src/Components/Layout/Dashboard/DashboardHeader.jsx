@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Logo from "../../../assets/logo.png";
 import avatar from "../../../assets/avatar.jpg";
 import { AiOutlineGift } from "react-icons/ai";
 import { MdOutlineLocalOffer } from "react-icons/md";
@@ -16,7 +15,7 @@ const DashboardHeader = () => {
     <>
       <div className="w-full h-[80px] bg-white shadow-md sticky top-0 left-0 flex items-center justify-between px-4 z-50">
         <Link to={"/"}>
-          <img src={Logo} alt="Logo" className="w-[150px] h-[120px]" />
+          <img src={"https://res.cloudinary.com/dctv1qmij/image/upload/v1739464039/rih9vuuuyyndshhijwyh.png"} alt="Logo" className="w-[150px] h-[120px]" />
         </Link>
 
         <div className="flex items-center">
