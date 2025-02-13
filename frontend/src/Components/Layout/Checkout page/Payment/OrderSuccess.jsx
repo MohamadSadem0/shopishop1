@@ -1,6 +1,6 @@
 import React from "react";
 import Lottie from "react-lottie";
-import animationData from "../../../../Assets/orderSucces.json";
+import animationData from "../../../../assets/orderSucces.json";
 
 const OrderSuccess = () => {
   const defaultOptions = {

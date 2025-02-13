@@ -1,6 +1,6 @@
 import React from "react";
 
-import avatar from "../../../../Assets/avatar.jpg";
+import avatar from "../../../../assets/avatar.jpg";
 import styles from "../../../../Styles/Style";
 import { Link } from "react-router-dom";
 

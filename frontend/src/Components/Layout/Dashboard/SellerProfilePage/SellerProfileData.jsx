@@ -15,9 +15,9 @@ import { RxDashboard } from "react-icons/rx";
 import { AiFillStar, AiOutlineArrowDown, AiOutlineStar } from "react-icons/ai";
 
 // images
-import reviewImage1 from "../../../../Assets/reviewImage1.jpg";
-import reviewImage2 from "../../../../Assets/reviewImage2.jpg";
-import reviewImage3 from "../../../../Assets/reviewImage3.jpg";
+import reviewImage1 from "../../../../assets/reviewImage1.jpg";
+import reviewImage2 from "../../../../assets/reviewImage2.jpg";
+import reviewImage3 from "../../../../assets/reviewImage3.jpg";
 
 const SellerProfileData = () => {
   const [active, setActive] = useState(1);

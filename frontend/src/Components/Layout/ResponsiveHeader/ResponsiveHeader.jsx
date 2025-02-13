@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BiMenuAltLeft } from "react-icons/bi";
-import Logo from "../../../Assets/logo.png";
+import Logo from "../../../assets/logo.png";
 import { Link } from "react-router-dom";
 import {
   AiOutlineHeart,
@@ -11,7 +11,7 @@ import { RxCross1 } from "react-icons/rx";
 import styles from "../../../Styles/Style";
 import Navbar from "../Navbar";
 import { IoIosArrowForward } from "react-icons/io";
-import avatar from "../../../Assets/avatar.jpg";
+import avatar from "../../../assets/avatar.jpg";
 import Cart from "../../Cart";
 import Wishlist from "../../Wishlist";
 import { useSelector } from "react-redux";

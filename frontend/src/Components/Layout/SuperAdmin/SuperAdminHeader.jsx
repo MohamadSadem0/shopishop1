@@ -1,7 +1,7 @@
   import React from "react";
   import { Link } from "react-router-dom";
-  import Logo from "../../../Assets/logo.png";
-  import avatar from "../../../Assets/avatar.jpg";
+  import Logo from "../../../assets/logo.png";
+  import avatar from "../../../assets/avatar.jpg";
   import { AiOutlineUser } from "react-icons/ai";
   import { FiUsers, FiSettings } from "react-icons/fi";
   import { MdOutlineCategory, MdOutlineDashboard } from "react-icons/md";

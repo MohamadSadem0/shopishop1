@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Logo from "../../../Assets/logo.png";
-import avatar from "../../../Assets/avatar.jpg";
+import Logo from "../../../assets/logo.png";
+import avatar from "../../../assets/avatar.jpg";
 import { AiOutlineGift } from "react-icons/ai";
 import { MdOutlineLocalOffer } from "react-icons/md";
 import { FiPackage, FiShoppingBag } from "react-icons/fi";
