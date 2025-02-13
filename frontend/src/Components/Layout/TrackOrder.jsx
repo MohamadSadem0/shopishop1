@@ -1,6 +1,6 @@
 import React from "react";
 
-import processingGif from "../../Assets/processing.gif";
+import processingGif from "../../assets/processing.gif";
 
 const TrackOrder = () => {
   return (

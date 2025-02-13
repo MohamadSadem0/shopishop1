@@ -5,7 +5,7 @@ import { AiOutlineCamera } from "react-icons/ai";
 
 import { motion } from "framer-motion";
 
-import avatar from "../../../../Assets/avatar.jpg";
+import avatar from "../../../../assets/avatar.jpg";
 
 const Settings = () => {
   // getting seller old info form local storage

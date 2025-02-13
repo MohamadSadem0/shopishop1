@@ -1,13 +1,13 @@
 import React from "react";
 import styles from "../../Styles/Style";
 
-import sponsored1 from "../../Assets/sponsored1.png";
-import sponsored2 from "../../Assets/sponsored2.png";
-import sponsored3 from "../../Assets/sponsored3.png";
-import sponsored4 from "../../Assets/sponsored4.png";
-import sponsored5 from "../../Assets/sponsored5.png";
-import sponsored6 from "../../Assets/sponsored6.png";
-import sponsored7 from "../../Assets/sponsored7.png";
+import sponsored1 from "../../assets/sponsored1.png";
+import sponsored2 from "../../assets/sponsored2.png";
+import sponsored3 from "../../assets/sponsored3.png";
+import sponsored4 from "../../assets/sponsored4.png";
+import sponsored5 from "../../assets/sponsored5.png";
+import sponsored6 from "../../assets/sponsored6.png";
+import sponsored7 from "../../assets/sponsored7.png";
 
 const Sponsored = () => {
   return (

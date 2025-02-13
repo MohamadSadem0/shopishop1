@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSectionsWithCategories } from "../../Redux/slices/sectionSlice";
 import styles from "../../Styles/Style";
-import Logo from "../../Assets/logo.png";
-import avatar from "../../Assets/avatar.jpg";
+import Logo from "../../assets/logo.png";
+import avatar from "../../assets/avatar.jpg";
 import {
   AiOutlineHeart,
   AiOutlineSearch,
