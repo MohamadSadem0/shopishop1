@@ -1,7 +1,7 @@
 
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllSections } from "../../Redux/slices/sectionSlice";
+import { fetchAllSections } from "../../redux/slices/sectionSlice";
 import { useNavigate } from "react-router-dom";
 import styles from "../../Styles/Style";
 

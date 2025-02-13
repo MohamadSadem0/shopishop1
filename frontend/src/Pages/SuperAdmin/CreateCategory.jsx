@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createNewCategory, fetchAllCategories } from "../../Redux/slices/categorySlice";
-import { fetchAllSections } from "../../Redux/slices/sectionSlice"; // Fetch sections
+import { createNewCategory, fetchAllCategories } from "../../redux/slices/categorySlice";
+import { fetchAllSections } from "../../redux/slices/sectionSlice"; // Fetch sections
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";

@@ -38,7 +38,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductById } from "../Redux/slices/productSlice"; // Import product fetch action
+import { fetchProductById } from "../redux/slices/productSlice"; // Import product fetch action
 import Header from "../Components/Layout/Header";
 import Footer from "../Components/Layout/Footer";
 import ProductDetails from "../Components/Layout/ProductDetails";

@@ -15,7 +15,7 @@ import { useCart } from "react-use-cart";
 
 /** Redux for wishlist only */
 import { useSelector, useDispatch } from "react-redux";
-import { addToWishlist, removeFromWishlist } from "../../Redux/WishlistAction";
+import { addToWishlist, removeFromWishlist } from "../../redux/WishlistAction";
 
 /** Styles */
 import styles from "../../Styles/Style";

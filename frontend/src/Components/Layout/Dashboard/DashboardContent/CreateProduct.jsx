@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createProduct } from "../../../../Redux/slices/productSlice";
-import { fetchCategoriesBySection } from "../../../../Redux/slices/categorySlice";
+import { createProduct } from "../../../../redux/slices/productSlice";
+import { fetchCategoriesBySection } from "../../../../redux/slices/categorySlice";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import styles from "../../../../Styles/Style";
 import { ToastContainer, toast } from "react-toastify";

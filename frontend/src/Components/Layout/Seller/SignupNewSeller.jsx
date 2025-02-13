@@ -7,8 +7,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { createStore, resetStore } from "../../../Redux/slices/storeSlice";
-import { fetchAllSections } from "../../../Redux/slices/sectionSlice";
+import { createStore, resetStore } from "../../../redux/slices/storeSlice";
+import { fetchAllSections } from "../../../redux/slices/sectionSlice";
 import useCloudinaryUpload from "../../../hooks/useCloudinaryUpload"; // Import Cloudinary upload hook
 
 const SignupNewSeller = () => {

@@ -4,8 +4,8 @@ import { BsCartPlus } from "react-icons/bs";
 import { RxCross1 } from "react-icons/rx";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { removeFromWishlist } from "../../Redux/WishlistAction";
-import { addTocart } from "../../Redux/CartAction";
+import { removeFromWishlist } from "../../redux/WishlistAction";
+import { addTocart } from "../../redux/CartAction";
 import { useDispatch, useSelector } from "react-redux";
 
 const WishlistSingle = ({ data, setOpenWishlist }) => {

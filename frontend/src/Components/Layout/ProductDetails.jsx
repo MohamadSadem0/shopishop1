@@ -11,7 +11,7 @@ import {
   AiOutlineShoppingCart,
 } from "react-icons/ai";
 
-import { addToWishlist, removeFromWishlist } from "../../Redux/WishlistAction";
+import { addToWishlist, removeFromWishlist } from "../../redux/WishlistAction";
 import ProductDetailsInfo from "./ProductDetailsInfo.jsx";
 import styles from "../../Styles/Style";
 

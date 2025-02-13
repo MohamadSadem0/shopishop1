@@ -6,7 +6,7 @@ import { RxAvatar } from "react-icons/rx";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../Redux/slices/authSlice";
+import { registerUser } from "../redux/slices/authSlice";
 import useCloudinaryUpload from "../hooks/useCloudinaryUpload"; // Import Cloudinary hook
 
 const Signup = () => {

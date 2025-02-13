@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPaginatedProducts, resetProducts } from "../Redux/slices/productSlice";
+import { fetchPaginatedProducts, resetProducts } from "../redux/slices/productSlice";
 import { useSearchParams } from "react-router-dom";
 import Header from "../Components/Layout/Header";
 import Product from "../Components/Layout/Product";

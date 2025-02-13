@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../Redux/slices/authSlice";
+import { loginUser } from "../redux/slices/authSlice";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../Styles/Style";
 import { Link, useNavigate } from "react-router-dom";

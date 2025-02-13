@@ -15,7 +15,7 @@ import {
 
 import ProductDetailsCart from "./ProductDetailsCart";
 import styles from "../../Styles/Style";
-import { removeFromWishlist, addToWishlist } from "../../Redux/WishlistAction";
+import { removeFromWishlist, addToWishlist } from "../../redux/WishlistAction";
 import axios from "../../utils/axiosInstance1"; // Adjust import if needed
 
 const Product = ({ data }) => {

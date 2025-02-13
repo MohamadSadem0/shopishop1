@@ -5,7 +5,7 @@ import {
   fetchProductsByStoreId,
   deleteProduct,
   applyDiscount, // <-- 1) Import the discount thunk
-} from "../../../../Redux/slices/productSlice";
+} from "../../../../redux/slices/productSlice";
 
 const AllProducts = () => {
   const dispatch = useDispatch();

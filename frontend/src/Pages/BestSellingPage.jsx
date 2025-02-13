@@ -1,7 +1,7 @@
 // BestSellingPage.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBestSellingProducts } from "../Redux/slices/productSlice";
+import { fetchBestSellingProducts } from "../redux/slices/productSlice";
 import Header from "../Components/Layout/Header";
 import Footer from "../Components/Layout/Footer";
 import Product from "../Components/Layout/Product";

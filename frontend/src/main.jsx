@@ -4,7 +4,7 @@ import App from "./App.jsx";
 import "./index.css";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react"; // ✅ Import PersistGate
-import Store, { persistor } from "./Redux/Store.js";
+import Store, { persistor } from "./redux/Store.js";
 import { CartProvider } from "react-use-cart";
 
 

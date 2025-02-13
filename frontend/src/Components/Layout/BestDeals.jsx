@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { fetchBestDeals } from "../../Redux/slices/productSlice";
+import { fetchBestDeals } from "../../redux/slices/productSlice";
 import Product from "./Product";
 import styles from "../../Styles/Style";
 

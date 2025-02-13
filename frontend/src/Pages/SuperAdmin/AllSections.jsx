@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllSections, deleteSection } from "../../Redux/slices/sectionSlice";
+import { fetchAllSections, deleteSection } from "../../redux/slices/sectionSlice";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 const AllSections = () => {

@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 
 // Import your cart slice thunks 
-import { fetchCart, removeFromCart, clearCart } from "../Redux/slices/cartSlice";
+import { fetchCart, removeFromCart, clearCart } from ".//slices/cartSlice";
 import CartSingle from "./Layout/CartSingle"; // A sub-component for rendering a single cart item
 
 const Cart = ({ setOpenCart }) => {

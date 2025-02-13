@@ -2,13 +2,13 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist"; // ✅ Single import
 import storage from "redux-persist/lib/storage"; // Uses localStorage
 
-import authReducer from "../Redux/slices/authSlice";
+import authReducer from ".//slices/authSlice";
 import  cartReducer  from "./slices/cartSlice";
 import { wishlistReducer } from "./Wishlist";
-import storeReducer from "../Redux/slices/storeSlice";
-import sectionReducer from "../Redux/slices/sectionSlice";
-import categorYReducer from "../Redux/slices/categorySlice";
-import productReducer from "../Redux/slices/productSlice";
+import storeReducer from ".//slices/storeSlice";
+import sectionReducer from ".//slices/sectionSlice";
+import categorYReducer from ".//slices/categorySlice";
+import productReducer from ".//slices/productSlice";
 
 // **Redux Persist Configuration**
 const persistConfig = {
