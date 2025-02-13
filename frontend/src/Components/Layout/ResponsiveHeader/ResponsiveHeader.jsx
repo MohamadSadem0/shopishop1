@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { BiMenuAltLeft } from "react-icons/bi";
-import Logo from "../../../Assets/logo.png";
 import { Link } from "react-router-dom";
 import {
   AiOutlineHeart,
@@ -81,7 +80,7 @@ const { buttonText, redirectPath } = (() => {
           </div>
 
           <Link to={"/"}>
-            <img src={Logo} alt="Logo" className="w-[150px] h-[120px]" />
+            <img src={"https://res.cloudinary.com/dctv1qmij/image/upload/v1739464039/rih9vuuuyyndshhijwyh.png"} alt="Logo" className="w-[150px] h-[120px]" />
           </Link>
 
           <div
