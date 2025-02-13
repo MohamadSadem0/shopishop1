@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { categoriesData } from "../../../../Static/data";
+// import { categoriesData } from "../../../../Static/data";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import styles from "../../../../Styles/Style";
 import { v4 } from "uuid";
@@ -133,7 +133,7 @@ const CreateEvent = () => {
               value={Category}
               required
               onChange={(e) => setCategory(e.target.value)}>
-              <option value="Choose a category">Choose a category </option>
+              {/* <option value="Choose a category">Choose a category </option>
               {categoriesData?.map((category, index) => (
                 <option
                   value={category.title}
@@ -141,7 +141,7 @@ const CreateEvent = () => {
                   className="flex flex-col">
                   {category.title}
                 </option>
-              ))}
+              ))} */}
             </select>
           </div>
 

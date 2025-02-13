@@ -5,7 +5,7 @@ import Categories from "../Components/Layout/Categories";
 import BestDeals from "../Components/Layout/BestDeals";
 import FeaturedProduct from "../Components/Layout/FeaturedProduct";
 import Events from "../Components/Layout/Events";
-import Sponsored from "../Components/Layout/Sponsored";
+// import Sponsored from "../Components/Layout/Sponsored";
 import Footer from "../Components/Layout/Footer";
 
 import { motion } from "framer-motion";
@@ -24,7 +24,7 @@ const HomePage = () => {
         <BestDeals />
         <Events />
         <FeaturedProduct />
-        <Sponsored />
+        {/* <Sponsored /> */}
         <Footer />
       </motion.div>
     </>
