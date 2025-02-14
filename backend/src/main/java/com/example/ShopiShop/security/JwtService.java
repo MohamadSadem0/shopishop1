@@ -35,7 +35,7 @@ public class JwtService {
         return generateToken(claims, user);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, User user) {2ertrtyqwyi    yi
+    public String generateToken(Map<String, Object> extraClaims, User user) {    
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
