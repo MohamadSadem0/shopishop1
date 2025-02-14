@@ -3,7 +3,8 @@ import axios from "axios";
 import { persistStore } from "redux-persist";
 
 // Base API URL
-const API_URL = "http://localhost:8080/public/auth";
+// const API_URL = "http://localhost:8080/public/auth";
+const API_URL = "http://shopishop_backend:8080";
 
 // Initial State
 const initialState = {
