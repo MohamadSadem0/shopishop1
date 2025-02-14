@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000","http://localhost:5000","http://localhost:5500","https://stunning-gelato-710ab3.netlify.app/")  // Allow frontend origin
+                .setAllowedOrigins("http://localhost:3000","http://localhost:5000","http://localhost:5500","https://stunning-gelato-710ab3.netlify.app")  // Allow frontend origin
                 .withSockJS();  // Fallback option for WebSocket support
     }
 

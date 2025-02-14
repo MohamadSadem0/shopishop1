@@ -17,7 +17,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5500","http://localhost:5000","https://stunning-gelato-710ab3.netlify.app/","http://84.8.108.111:3000")
+                        .allowedOrigins("http://localhost:5500","http://localhost:5000","https://stunning-gelato-710ab3.netlify.app","http://84.8.108.111:3000")
 
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

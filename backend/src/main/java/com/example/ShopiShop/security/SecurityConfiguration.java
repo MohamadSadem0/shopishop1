@@ -61,7 +61,7 @@ public class SecurityConfiguration {
         config.addAllowedOrigin("http://localhost:5500");  // Frontend origin
         config.addAllowedOrigin("http://84.8.108.111:3000");  // Frontend origin
         config.addAllowedOrigin("http://shopishop-frontend:80");
-        config.addAllowedOrigin("https://stunning-gelato-710ab3.netlify.app/");  // Frontend origin
+        config.addAllowedOrigin("https://stunning-gelato-710ab3.netlify.app");  // Frontend origin
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
