@@ -1,30 +1,30 @@
-# # ============ Stage 1: Build the React app ============
-# FROM node:18-alpine AS build
-# WORKDIR /app
+# ============ Stage 1: Build the React app ============
+FROM node:18-alpine AS build
+WORKDIR /app
 
-# # Copy package files and install dependencies
-# COPY package*.json ./
+# Copy package files and install dependencies
+COPY package*.json ./
 
-# # Force a clean installation while handling peer dependencies properly
-# RUN npm ci --legacy-peer-deps
+# Force a clean installation while handling peer dependencies properly
+RUN npm ci --legacy-peer-deps
 
-# # Copy all source code
-# COPY . .
+# Copy all source code
+COPY . .
 
-# # Force rebuild and clean cache before production build
-# RUN rm -rf node_modules/.cache && npm run build --legacy-peer-deps
+# Force rebuild and clean cache before production build
+RUN rm -rf node_modules/.cache && npm run build --legacy-peer-deps
 
-# # ============ Stage 2: Serve the built files via Nginx ============
-# FROM nginx:alpine
+# ============ Stage 2: Serve the built files via Nginx ============
+FROM nginx:alpine
 
-# # Remove default website
-# RUN rm -rf /usr/share/nginx/html/*
+# Remove default website
+RUN rm -rf /usr/share/nginx/html/*
 
-# # Copy compiled frontend from the build stage
-# COPY --from=build /app/dist /usr/share/nginx/html
+# Copy compiled frontend from the build stage
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# # Expose Nginx port
-# EXPOSE 80
+# Expose Nginx port
+EXPOSE 80
 
-# # Run Nginx in foreground
-# CMD ["nginx", "-g", "daemon off;"]
+# Run Nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]
