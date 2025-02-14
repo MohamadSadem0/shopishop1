@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Base API URL
 // const API_URL = "http://localhost:8080/customer/store/create";
-const API_URL = "http://shopishop_backend:8080/customer/store/create";
+const API_URL = "http://84.8.108.111:8080/customer/store/create";
 
 // Fetch user token from localStorage
 

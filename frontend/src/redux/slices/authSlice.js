@@ -4,7 +4,7 @@ import { persistStore } from "redux-persist";
 
 // Base API URL
 // const API_URL = "http://localhost:8080/public/auth";
-const API_URL = "http://shopishop_backend:8080";
+const API_URL = "http://84.8.108.111:8080/public/auth";
 
 // Initial State
 const initialState = {

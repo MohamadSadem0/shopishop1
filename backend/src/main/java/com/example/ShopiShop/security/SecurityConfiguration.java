@@ -59,6 +59,7 @@ public class SecurityConfiguration {
         config.addAllowedOrigin("http://localhost:3000");  // Frontend origin
         config.addAllowedOrigin("http://localhost:5000");  // Frontend origin
         config.addAllowedOrigin("http://localhost:5500");  // Frontend origin
+        config.addAllowedOrigin("http://84.8.108.111:3000");  // Frontend origin
         config.addAllowedOrigin("http://shopishop-frontend:80");
         config.addAllowedOrigin("https://unique-gnome-289962.netlify.app");  // Frontend origin
         config.addAllowedHeader("*");

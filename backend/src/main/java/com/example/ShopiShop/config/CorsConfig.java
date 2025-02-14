@@ -17,7 +17,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5500","https://unique-gnome-289962.netlify.app/","http://localhost:5000")
+                        .allowedOrigins("http://localhost:5500","http://localhost:5000","http://84.8.108.111:3000")
 
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

@@ -5,7 +5,7 @@ import store from "../redux/Store";  // <-- import your Redux store
 
 const instance = axios.create({
   // baseURL: "http://localhost:8080", // or your actual base URL
-  baseURL: "http://shopishop_backend:8080", // or your actual base URL
+  baseURL: "http://84.8.108.111:8080/", // or your actual base URL
 });
 
 instance.interceptors.request.use(
