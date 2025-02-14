@@ -31,15 +31,15 @@ services:
       # SPRING_MAIL_USERNAME: "some-email@gmail.com"
       # SPRING_MAIL_PASSWORD: "some-app-password"
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.frontend
-    container_name: shopishop_frontend
-    depends_on:
-      - backend
-    ports:
-      - "3000:80"
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.frontend
+  #   container_name: shopishop_frontend
+  #   depends_on:
+  #     - backend
+  #   ports:
+  #     - "3000:80"
 
 volumes:
   db_data:
