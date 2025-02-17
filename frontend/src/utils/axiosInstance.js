@@ -1,7 +1,6 @@
 import axios from 'axios';
+import baseURL from '../../url';
 
-// const baseURL = "http://localhost:8080"; // Default to local API if env variable is missing
-const baseURL = "http://84.8.108.111:8080/"; // Default to local API if env variable is missing
 
 const axiosInstance = axios.create({
   baseURL,

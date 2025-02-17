@@ -112,6 +112,32 @@ export const fetchProductById = createAsyncThunk(
   }
 );
 
+
+export const updateProduct = createAsyncThunk(
+  "products/updateProduct",
+  async ({ productId, productData }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      if (!token) throw new Error("Authentication token is missing.");
+      // Call the backend update endpoint
+      const response = await axiosInstance.put(
+        `/merchant/product/update/${productId}`,
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data.data; // the updated product
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update product."
+      );
+    }
+  }
+);
+
 export const fetchPaginatedProducts = createAsyncThunk(
   "products/fetchPaginatedProducts",
   async ({ page, category }, { rejectWithValue }) => {
@@ -201,6 +227,29 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+    .addCase(updateProduct.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(updateProduct.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      const updatedProduct = action.payload;
+      // Update the product in the products array if it exists
+      const index = state.products.findIndex((p) => p.id === updatedProduct.id);
+      if (index !== -1) {
+        state.products[index] = updatedProduct;
+      }
+      // Also update selectedProduct if needed
+      if (
+        state.selectedProduct &&
+        state.selectedProduct.id === updatedProduct.id
+      ) {
+        state.selectedProduct = updatedProduct;
+      }
+    })
+    .addCase(updateProduct.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload;
+    })
         // ✅ Fetch single product by ID
         .addCase(applyDiscount.pending, (state) => {
           state.status = "loading";

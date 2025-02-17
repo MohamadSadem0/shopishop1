@@ -2,10 +2,10 @@
 // src/services/axiosInstance.js
 import axios from "axios";
 import store from "../redux/Store";  // <-- import your Redux store
+import baseURL from "../../url";
 
 const instance = axios.create({
-  // baseURL: "http://localhost:8080", // or your actual base URL
-  baseURL: "http://84.8.108.111:8080/", // or your actual base URL
+  baseURL: baseURL, // or your actual base URL
 });
 
 instance.interceptors.request.use(

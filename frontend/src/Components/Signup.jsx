@@ -12,7 +12,7 @@ import useCloudinaryUpload from "../hooks/useCloudinaryUpload"; // Import Cloudi
 const Signup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.auth);
+  const { loading } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -172,6 +172,13 @@ const Signup = () => {
               <h4>Already have an account?</h4>
               <Link to="/login" className="text-blue-600 pl-2">
                 Sign in
+              </Link>
+            </div>
+
+            {/* Back to Site Button */}
+            <div className="flex justify-center pt-4">
+              <Link to="/" className="text-blue-600 hover:underline text-sm">
+                Back to Site
               </Link>
             </div>
           </form>

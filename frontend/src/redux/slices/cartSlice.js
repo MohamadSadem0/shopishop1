@@ -1,9 +1,9 @@
 // src/Redux/slices/cartSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import baseURL from "../../../url";
 
-// const API_BASE_URL = "http://localhost:8080/customer/cart";
-const API_BASE_URL = "http://84.8.108.111:8080/customer/cart";
+const API_BASE_URL = `${baseURL}/customer/cart`;
 
 // Get token from auth state
 const getAuthToken = (state) => state.auth?.token || null;

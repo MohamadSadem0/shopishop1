@@ -4,7 +4,8 @@ import {
   fetchAllProducts,
   fetchProductsByStoreId,
   deleteProduct,
-  applyDiscount, // <-- 1) Import the discount thunk
+  applyDiscount, // discount thunk
+  updateProduct, // new update thunk
 } from "../../../../redux/slices/productSlice";
 
 const AllProducts = () => {
@@ -12,14 +13,25 @@ const AllProducts = () => {
   const { products, status, error } = useSelector((state) => state.products);
   const { role, store } = useSelector((state) => state.auth);
 
-  // 2) Local states for discount modal
+  // Modal states for discount and update
   const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
+
+  // State for discount data
   const [discountData, setDiscountData] = useState({
     discountPrice: "",
     discountPercent: "",
     discountStartDate: "",
     discountEndDate: "",
+  });
+
+  // State for update data
+  const [updateData, setUpdateData] = useState({
+    name: "",
+    description: "",
+    price: "",
+    // add other fields as needed
   });
 
   useEffect(() => {
@@ -37,18 +49,29 @@ const AllProducts = () => {
     }
   };
 
-  // 3) Open the discount modal
+  // Open the discount modal
   const handleDiscountClick = (productId) => {
     setSelectedProductId(productId);
     setShowDiscountModal(true);
   };
 
-  // 4) Submit discount data to the thunk
+  // Open the update modal and pre-fill with product data
+  const handleEditClick = (product) => {
+    setSelectedProductId(product.id);
+    setUpdateData({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      // pre-fill additional fields as necessary
+    });
+    setShowUpdateModal(true);
+  };
+
+  // Handle discount submission
   const handleDiscountSubmit = async (e) => {
     e.preventDefault();
     if (!selectedProductId) return;
 
-    // Convert fields if needed (e.g., from string to number)
     const payload = {
       discountPrice: discountData.discountPrice
         ? parseFloat(discountData.discountPrice)
@@ -60,12 +83,10 @@ const AllProducts = () => {
       discountEndDate: discountData.discountEndDate || null,
     };
 
-    // Dispatch the thunk
     await dispatch(
       applyDiscount({ productId: selectedProductId, discountData: payload })
     ).unwrap();
 
-    // Close modal & reset
     setShowDiscountModal(false);
     setDiscountData({
       discountPrice: "",
@@ -75,9 +96,26 @@ const AllProducts = () => {
     });
   };
 
-  // 5) Close the discount modal
+  // Handle update submission
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedProductId) return;
+    try {
+      await dispatch(
+        updateProduct({ productId: selectedProductId, productData: updateData })
+      ).unwrap();
+      alert("Product updated successfully!");
+      setShowUpdateModal(false);
+      setUpdateData({ name: "", description: "", price: "" });
+      setSelectedProductId(null);
+    } catch (err) {
+      alert("Update failed: " + err);
+    }
+  };
+
   const closeModal = () => {
     setShowDiscountModal(false);
+    setShowUpdateModal(false);
     setSelectedProductId(null);
     setDiscountData({
       discountPrice: "",
@@ -85,6 +123,7 @@ const AllProducts = () => {
       discountStartDate: "",
       discountEndDate: "",
     });
+    setUpdateData({ name: "", description: "", price: "" });
   };
 
   return (
@@ -109,7 +148,7 @@ const AllProducts = () => {
               <tr className="bg-gray-100">
                 <th className="border p-3">Name</th>
                 <th className="border p-3">Description</th>
-                <th className="border p-3">Category ID</th>
+                <th className="border p-3">Category</th>
                 <th className="border p-3">Price</th>
                 <th className="border p-3">Image</th>
                 <th className="border p-3">Store ID</th>
@@ -156,7 +195,10 @@ const AllProducts = () => {
                     >
                       Discount
                     </button>
-                    <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                    <button
+                      onClick={() => handleEditClick(product)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                    >
                       Edit
                     </button>
                   </td>
@@ -171,7 +213,7 @@ const AllProducts = () => {
         )
       )}
 
-      {/* 6) Discount Modal */}
+      {/* Discount Modal */}
       {showDiscountModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
           <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-[400px]">
@@ -246,6 +288,70 @@ const AllProducts = () => {
                 <button
                   type="submit"
                   className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Update Modal */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-[400px]">
+            <h3 className="text-xl font-semibold mb-4">Edit Product</h3>
+            <form onSubmit={handleUpdateSubmit} className="space-y-3">
+              <div>
+                <label className="block mb-1">Name</label>
+                <input
+                  type="text"
+                  className="w-full border px-2 py-1 rounded"
+                  value={updateData.name}
+                  onChange={(e) =>
+                    setUpdateData({ ...updateData, name: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Description</label>
+                <input
+                  type="text"
+                  className="w-full border px-2 py-1 rounded"
+                  value={updateData.description}
+                  onChange={(e) =>
+                    setUpdateData({
+                      ...updateData,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Price</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="w-full border px-2 py-1 rounded"
+                  value={updateData.price}
+                  onChange={(e) =>
+                    setUpdateData({ ...updateData, price: e.target.value })
+                  }
+                />
+              </div>
+              {/* Add additional fields as needed */}
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                 >
                   Save
                 </button>

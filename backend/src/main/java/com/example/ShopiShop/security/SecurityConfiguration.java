@@ -3,6 +3,7 @@ package com.example.ShopiShop.security;
 
 import com.example.ShopiShop.enums.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -23,6 +24,8 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+    @Value("${app.frontend-url}")
+    private  String frontendUrl;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -56,12 +59,7 @@ public class SecurityConfiguration {
 
         // Allow all origins, headers, and methods for testing; modify as needed
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");  // Frontend origin
-        config.addAllowedOrigin("http://localhost:5000");  // Frontend origin
-        config.addAllowedOrigin("http://localhost:5500");  // Frontend origin
-        config.addAllowedOrigin("http://84.8.108.111:3000");  // Frontend origin
-        config.addAllowedOrigin("http://shopishop-frontend:80");
-        config.addAllowedOrigin("https://stunning-gelato-710ab3.netlify.app");  // Frontend origin
+        config.addAllowedOrigin(frontendUrl);  // Frontend origin
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 

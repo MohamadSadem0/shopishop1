@@ -116,11 +116,18 @@ const Login = () => {
               </button>
             </div>
 
-            {/* Added Don't have an account? Sign up */}
+            {/* Sign Up Link */}
             <div className={`${styles.noramlFlex} justify-center pt-4`}>
               <span className="text-gray-600 text-sm">Don't have an account?</span>
               <Link to="/sign-up" className="text-blue-600 pl-2 font-medium">
                 Sign up
+              </Link>
+            </div>
+
+            {/* Back to Site Button */}
+            <div className="flex justify-center pt-4">
+              <Link to="/" className="text-blue-600 hover:underline text-sm">
+                Back to Site
               </Link>
             </div>
           </form>

@@ -9,12 +9,17 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineTrackChanges } from "react-icons/md";
 import { TbAddressBook } from "react-icons/tb";
 import { toast, ToastContainer } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/slices/authSlice";
 
 const ProfileSideBar = ({ active, setActive }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // logout functionality
   const handleLogout = () => {
+dispatch(logout())
+persistor.purge(); 
     navigate("/login");
     toast("Logout Success");
   };
