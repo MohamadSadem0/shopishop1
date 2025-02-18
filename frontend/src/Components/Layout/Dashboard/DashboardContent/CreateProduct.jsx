@@ -67,7 +67,7 @@ const CreateProduct = () => {
     try {
       await dispatch(createProduct(productData)).unwrap();
       toast.success("Product Created Successfully!");
-      setTimeout(() => navigate("/dashboard/dashboard-products"), 2000);
+      setTimeout(() => navigate("/dashboard-products"), 2000);
     } catch (error) {
       toast.error(error || "Failed to create product.");
     }

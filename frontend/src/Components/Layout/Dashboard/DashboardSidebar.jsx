@@ -14,7 +14,7 @@ const DashboardSidebar = ({ active, setActive }) => {
   return (
     <>
       <div
-        className="w-full h-[89vh] bg-white shadow-sm z-10 overflow-y-scroll top-0 left-0 sticky py-5"
+        className="w-full h-screen bg-white shadow-sm z-10 overflow-y- top-0 left-0 sticky py-5 overscroll-none"
         style={{ scrollbarWidth: "none" }}>
         <div
           className="flex items-center w-full p-4 cursor-pointer"

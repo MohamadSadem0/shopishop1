@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <div className="bg-[#000] text-white ">
-      <div className="py-7 md:flex md:justify-between md:items-center md:px-12 px-4 bg-[#342ac8]">
+      <div className="py-7 md:flex md:justify-between md:items-center md:px-12 px-4 bg-[#8b8a42]">
         <h1 className="text-3xl lg:text-4xl md:mb-0 md:leading-normal font-semibold md:2/5 mb-6">
           <span className="text-[#56d879]">Subscribe </span>
           <span>

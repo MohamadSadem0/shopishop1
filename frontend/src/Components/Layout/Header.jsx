@@ -153,7 +153,7 @@ const Header = ({ activeHeading }) => {
 
       {/* =============== Header Bottom =============== */}
       <div
-        className={`800px:flex hidden w-full bg-[#3957db] items-center justify-between transition p-5 1040px:p-0 ${
+        className={`800px:flex hidden w-full bg-[#8b8a42] items-center justify-between transition p-5 1040px:p-0 ${
           isScrolled ? "fixed top-0 left-0 shadow-sm z-10" : ""
         }`}
       >

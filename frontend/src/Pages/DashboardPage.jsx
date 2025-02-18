@@ -9,15 +9,15 @@ const DashboardPage = () => {
   const { user } = useSelector((state) => state.auth);
 
   return (
-    <>
+    <div className="overscroll-y-none">
       <DashboardHeader />
-      <div className="flex w-full">
-        <div className="w-[70px] 800px:w-[335px]">
+      <div className="flex w-full overflow-y-hidden">
+        <div className="w-[70px] 800px:w-[335px] overscroll-none">
           <DashboardSidebar active={active} setActive={setActive} userRole={user?.userRole} />
         </div>
         <DashboardContent active={active} userRole={user?.userRole} />
       </div>
-    </>
+    </div>
   );
 };
 

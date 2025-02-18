@@ -6,19 +6,19 @@ import banner from "../../assets/banner.jpg";
 const Hero = () => {
   return (
     <div
-      className={`${styles.noramlFlex} relative min-h-[70vh] 800px:min-h-[80vh] w-full bg-no-repeat`}
+      className={`${styles.noramlFlex} relative min-h-[70vh] 800px:min-h-[80vh] w-full bg-no-repeat `}
       style={{
-        backgroundImage: `url(${banner})`,
+        backgroundImage: `url("https://res.cloudinary.com/dctv1qmij/image/upload/v1739902980/ejfdhh2wbigdouzuigbf.webp")`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}>
       <div className={`${styles.section} w-[90%] 800px:w-[60%] `}>
-        <h4 className="text-[34px] 800px:text-[60px] font-[600] capitalize text-[#3d3a3a] leading-[1.2] ">
+        <h4 className="text-[34px] 800px:text-[60px] font-[600] capitalize text-[#000000] leading-[1.2] ">
           Best Collection for <br />
           home decoration
         </h4>
 
-        <p className="pt-5 font-[400] font-Poppins text-[16px] text-[#000000ba]">
+        <p className="pt-5 font-[400] font-Poppins text-[16px] text-[#000000]">
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quo
           voluptate, illum ratione, facere, eveniet nostrum laborum adipisci
           repellendus praesentium fugiat voluptatibus hic natus soluta

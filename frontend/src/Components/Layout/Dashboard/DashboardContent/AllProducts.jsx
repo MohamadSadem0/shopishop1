@@ -163,7 +163,7 @@ const AllProducts = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full h-full overflow-auto">
       <h2 className="text-3xl font-bold text-center mb-8">All Products</h2>
 
       {/* Loading & Error States */}

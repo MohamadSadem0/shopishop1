@@ -12,7 +12,7 @@ import Settings from "./Settings";
 
 const DashboardContent = ({ active }) => {
   return (
-    <div className="w-full p-8">
+    <div className="w-full p-8  ">
       {active === 1 && <MainDashboard />}
       {active === 2 && <AllOrders />}
       {active === 3 && <AllProducts />}
