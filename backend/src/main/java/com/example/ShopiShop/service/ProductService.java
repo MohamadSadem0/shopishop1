@@ -1,9 +1,6 @@
 package com.example.ShopiShop.service;
 
-import com.example.ShopiShop.dto.DiscountRequest;
-import com.example.ShopiShop.dto.ProductRequest;
-import com.example.ShopiShop.dto.ProductResponse;
-import com.example.ShopiShop.dto.ReviewResponse;
+import com.example.ShopiShop.dto.*;
 import com.example.ShopiShop.exceptions.ResourceNotFoundException;
 import com.example.ShopiShop.models.Category;
 import com.example.ShopiShop.models.Product;
@@ -180,6 +177,31 @@ public class ProductService {
 
         Product saved = productRepository.save(product);
         return mapToProductResponse(saved);
+    }
+
+
+    @Transactional
+    public ProductResponse updateProduct(UUID productId, @Valid ProductUpdateRequest request) {
+        // Retrieve the existing product
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        // Update product fields with the new data from the request
+        product.setName(request.name());
+        product.setDescription(request.description());
+        product.setPrice(request.price());
+        product.setImageUrl(request.imageUrl());
+
+        // Update category: fetch the Category by name
+//        Category category = categoryRepository.findByName(request.categoryName())
+//                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+//        product.setCategory(category);
+
+        // Save the updated product
+        Product updatedProduct = productRepository.save(product);
+
+        // Map to DTO and return
+        return mapToProductResponse(updatedProduct);
     }
 
 }

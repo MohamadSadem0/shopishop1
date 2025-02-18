@@ -58,7 +58,7 @@ const PaymentInfo = ({ setOpen }) => {
           <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
+            exit={{ opacity: 0, y: -50 }} 
             transition={{ duration: 0.3 }}
             className="w-full flex border-b">
             <form className="w-full" onSubmit={paymentHandler}>

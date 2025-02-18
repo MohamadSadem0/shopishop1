@@ -1,6 +1,7 @@
 package com.example.ShopiShop.models;
 
 import com.example.ShopiShop.enums.OrderStatus;
+import com.example.ShopiShop.enums.PaymentMethodEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -28,15 +29,22 @@ public class Order {
 
     // List of order items (each corresponds to a product purchased)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems=new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     // Total amount (before or after discounts, as applicable)
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
+    // New field: total price (if it is supposed to be the same as totalAmount or computed differently)
+    @Column(name = "total_price", nullable = false)
+    private BigDecimal totalPrice;
+
     // The shipping address (this could be more structured, e.g., an embeddable, if desired)
     @Column(nullable = true)
     private String shippingAddress;
+
+    @Column(nullable = true)
+    private String cityAddress;
 
     @Column(name = "contact")
     private String contactNbr;
@@ -45,4 +53,7 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethodEnum paymentMethodEnum;
 }

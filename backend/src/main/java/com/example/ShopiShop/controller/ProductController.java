@@ -1,16 +1,16 @@
 package com.example.ShopiShop.controller;
 
-import com.example.ShopiShop.dto.ApiResponse;
-import com.example.ShopiShop.dto.DiscountRequest;
-import com.example.ShopiShop.dto.ProductRequest;
-import com.example.ShopiShop.dto.ProductResponse;
+import com.example.ShopiShop.dto.*;
 import com.example.ShopiShop.service.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -104,4 +104,17 @@ public class ProductController {
         ProductResponse updated = productService.applyDiscount(productId, discountRequest);
         return ResponseEntity.ok(new ApiResponse<>(true, "Discount applied", updated));
     }
+
+    // Update Product (Admin/Merchant Only)
+// Update Product (Admin/Merchant Only)
+    @PutMapping("/merchant/product/update/{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
+            @PathVariable UUID id,
+            @Valid @RequestBody ProductUpdateRequest request) {
+        ProductResponse response = productService.updateProduct(id, request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Product updated successfully", response));
+    }
+
+
+
 }

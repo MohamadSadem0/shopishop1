@@ -41,7 +41,7 @@ public class JwtService {
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 // 1 hour = 1000ms * 60 * 60
-                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60)))
+                .setExpiration(new Date(System.currentTimeMillis() + (100000 * 60 * 60)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

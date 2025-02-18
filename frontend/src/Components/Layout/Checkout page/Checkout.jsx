@@ -54,7 +54,9 @@ const Checkout = () => {
 
     // Build the order data object that you want to send to your backend.
     const orderData = {
-      shippingAddress,
+      shippingAddress :address1,
+      city : city,
+      contactNumber:  number,
       discountPrice,
       // Optionally send cart data if needed by your API
       cart,
@@ -69,6 +71,8 @@ const Checkout = () => {
       // Post the order data to your backend API endpoint
       const response = await axios.post("/customer/orders/checkout", orderData, config);
 
+      console.log(orderData);
+      
       // Assuming your backend responds with an order ID and message:
       const { orderId, message } = response.data;
       toast.success(message || "Order created successfully. Proceeding to payment.");

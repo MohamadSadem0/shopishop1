@@ -1,40 +1,72 @@
 package com.example.ShopiShop.controller;
 
+import com.example.ShopiShop.dto.OrderRequest;
 import com.example.ShopiShop.dto.OrderResponse;
+import com.example.ShopiShop.dto.PaymentUpdateRequest;
 import com.example.ShopiShop.models.Order;
 import com.example.ShopiShop.models.User;
+import com.example.ShopiShop.repositories.UserRepository;
 import com.example.ShopiShop.service.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-// You may need to retrieve the currently authenticated user,
-// for example, via Spring Security.
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/customer/orders")
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserRepository userRepository; // Make sure this exists
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, UserRepository userRepository) {
         this.orderService = orderService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<OrderResponse> checkout(@RequestParam String shippingAddress) {
-        // For demonstration purposes, assume you have a method to get the current user.
+    public ResponseEntity<OrderResponse> checkout(@RequestBody @Valid OrderRequest orderRequest) {
+        // Retrieve the current user from the security context
         User currentUser = getCurrentAuthenticatedUser();
 
-        Order order = orderService.createOrderForUser(currentUser, shippingAddress);
+        // Use the shipping address from the orderRequest
+        Order order = orderService.createOrderForUser(currentUser, orderRequest);
 
         OrderResponse response = new OrderResponse(order.getId(), "Order created successfully.");
         return ResponseEntity.ok(response);
     }
 
     private User getCurrentAuthenticatedUser() {
-        // Implement retrieval of the currently authenticated user,
-        // e.g., from a security context or JWT token.
-        // For now, throw an exception if not implemented.
-        throw new UnsupportedOperationException("Implement user retrieval logic");
+        // Get the authentication object from the SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RuntimeException("User is not authenticated");
+        }
+
+        String email;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        // Fetch the user from the repository using the email
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
+    @PutMapping("/{orderId}/payment")
+    public ResponseEntity<?> updatePaymentMethod(
+            @PathVariable UUID orderId,
+            @RequestBody @Valid PaymentUpdateRequest paymentUpdateRequest) {
+
+        Order updatedOrder = orderService.updatePaymentMethod(orderId, paymentUpdateRequest);
+        return ResponseEntity.ok(updatedOrder);
     }
 }
