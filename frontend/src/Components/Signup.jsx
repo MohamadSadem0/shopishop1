@@ -7,12 +7,15 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../redux/slices/authSlice";
-import useCloudinaryUpload from "../hooks/useCloudinaryUpload"; // Import Cloudinary hook
+import useCloudinaryUpload from "../hooks/useCloudinaryUpload";
 
 const Signup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
+
+  // Local state for the response message
+  const [responseMessage, setResponseMessage] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,7 +28,7 @@ const Signup = () => {
   const [avatar, setAvatar] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  const { uploadImage } = useCloudinaryUpload(); // Cloudinary upload function
+  const { uploadImage } = useCloudinaryUpload();
 
   const handleFileInputChange = async (e) => {
     const file = e.target.files[0];
@@ -53,9 +56,15 @@ const Signup = () => {
     try {
       const result = await dispatch(registerUser(formData));
 
+      console.log(result);
+      
       if (registerUser.fulfilled.match(result)) {
-        toast.success("Account successfully created!");
-        navigate("/login");
+        // result.payload has the shape: { success, message, data }
+        setResponseMessage(result.payload.message);
+        toast.success(result.payload.message);
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       } else {
         toast.error(result.payload);
       }
@@ -70,6 +79,11 @@ const Signup = () => {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Register as a new user
         </h2>
+        {responseMessage && (
+          <div className="mt-4 p-2 bg-green-100 text-green-800 text-center rounded">
+            {responseMessage}
+          </div>
+        )}
       </div>
       <div className="mt-8 mx-auto w-[90%] 800px:w-[45%]">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
@@ -168,14 +182,21 @@ const Signup = () => {
                 {loading || uploading ? "Processing..." : "Submit"}
               </button>
             </div>
+            <div className="flex justify-center pt-4">
+              <button
+                type="button"
+                onClick={() => navigate("/forget-password")}
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Forgot your password?
+              </button>
+            </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Already have an account?</h4>
               <Link to="/login" className="text-blue-600 pl-2">
                 Sign in
               </Link>
             </div>
-
-            {/* Back to Site Button */}
             <div className="flex justify-center pt-4">
               <Link to="/" className="text-blue-600 hover:underline text-sm">
                 Back to Site
@@ -184,8 +205,6 @@ const Signup = () => {
           </form>
         </div>
       </div>
-
-      {/* Toast Messages */}
       <ToastContainer
         position="top-right"
         autoClose={2000}

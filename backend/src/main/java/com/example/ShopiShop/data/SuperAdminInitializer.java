@@ -17,13 +17,15 @@ public class SuperAdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        String superAdminEmail = "admin@shopishop.com";
+                String superAdminEmail = "admin@shopishop.com";
 
         // Check if a Super Admin already exists
         if (userRepository.existsByEmail(superAdminEmail)) {
             System.out.println("✅ Super Admin already exists.");
             return;
         }
+
+
 
         // Create Super Admin
         User superAdmin = User.builder()
@@ -39,3 +41,49 @@ public class SuperAdminInitializer implements CommandLineRunner {
         System.out.println("🚀 Super Admin created successfully! Email: " + superAdminEmail);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -14,10 +14,13 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     List<User> findByUserRole(UserRoleEnum userRole);
-    User findByConfirmationToken(String confirmationToken);
+//    User findByConfirmationToken(String confirmationToken);
+
+    Optional<User> findByResetPasswordToken(String token);
 
     boolean existsByEmail(String email);
 
+    Optional<User> findByConfirmationToken(String confirmationToken);
 
    Optional<User>findById(Long uuid);
 }

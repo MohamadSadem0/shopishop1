@@ -9,26 +9,15 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from "framer-motion";
-
-/** React Use Cart */
 import { useCart } from "react-use-cart";
-
-/** Redux for wishlist only */
 import { useSelector, useDispatch } from "react-redux";
 import { addToWishlist, removeFromWishlist } from "../../redux/WishlistAction";
-
-/** Styles */
 import styles from "../../Styles/Style";
 
 const ProductDetailsCart = ({ data, setOpen }) => {
   const dispatch = useDispatch();
-
-  // We still handle wishlist with Redux
   const { wishlist } = useSelector((state) => state.wishlist);
-
-  // react-use-cart
   const { items, addItem } = useCart();
-
   const [count, setCount] = useState(1);
   const [isInWishlist, setIsInWishlist] = useState(false);
 
@@ -37,41 +26,41 @@ const ProductDetailsCart = ({ data, setOpen }) => {
   };
 
   const incrementCount = () => {
+    // Prevent increasing count beyond available quantity
+    if (data?.quantity && count >= data.quantity) {
+      toast.error("You cannot add more than the available quantity!");
+      return;
+    }
     setCount(count + 1);
   };
 
-  /**
-   * Add to cart
-   */
   const addToCartHandler = () => {
+    // Check if item already exists in cart
     const isItemExists = items.find((item) => item.id === data.id);
     if (isItemExists) {
       toast.error("Item already in cart.");
       return;
     }
-
-    if (data?.stock && count > data.stock) {
+    // Validate quantity
+    if (data?.quantity && count > data.quantity) {
       toast.error("Product stock is limited!");
       return;
     }
-
-    // add to cart
+    // Add item with selected count
     addItem(
       {
         id: data.id,
         price: data.price,
         name: data.name,
         imageUrl: data.imageUrl,
+        // Optionally, pass the available quantity if needed:
+        availableQuantity: data.quantity,
       },
       count
     );
-
     toast.success("Item added to cart!");
   };
 
-  /**
-   * Check if product is in wishlist
-   */
   useEffect(() => {
     if (wishlist?.some((item) => item.id === data.id)) {
       setIsInWishlist(true);
@@ -80,9 +69,6 @@ const ProductDetailsCart = ({ data, setOpen }) => {
     }
   }, [wishlist, data.id]);
 
-  /**
-   * Handle add/remove wishlist
-   */
   const handleWishlistRemoveItem = () => {
     setIsInWishlist(false);
     dispatch(removeFromWishlist(data));
@@ -102,24 +88,23 @@ const ProductDetailsCart = ({ data, setOpen }) => {
           initial={{ opacity: 0, y: -500 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -500 }}
+          transition={{ duration: 0.5 }}
           className="w-[90%] 800px:w-[60%] h-[90vh] 800px:h-[75vh] rounded-md p-4 relative shadow-sm overflow-y-scroll bg-white"
         >
           <RxCross1
             size={40}
             color="#333"
-            className="absolute top-1 right-1 cursor-pointer p-2 hover:bg-gray-200 hover:text-gray-50 rounded-full"
+            className="absolute top-1 right-1 cursor-pointer p-2 hover:bg-gray-200 rounded-full"
             onClick={() => setOpen(false)}
           />
-
           <div className="block w-full 800px:flex">
-            {/* Left Column: Product Image & Shop Info */}
+            {/* Left Column: Image and Shop Info */}
             <div className="800px:w-[50%] w-full">
               <img
                 src={data?.imageUrl}
                 alt={data?.name || "product"}
                 className="w-full h-auto object-cover"
               />
-
               <div className="flex items-center mt-5">
                 <img
                   src={data?.shop?.shop_avatar?.url || "/default-shop-avatar.png"}
@@ -127,13 +112,12 @@ const ProductDetailsCart = ({ data, setOpen }) => {
                   className="w-[50px] h-[50px] rounded-full mr-2 object-cover"
                 />
                 <div>
-                  <h3 className={`${styles.shop_name}`}>
+                  <h3 className={styles.shop_name}>
                     {data?.shop?.name || "Unknown Shop"}
                   </h3>
                   <h3 className="text-[15px]">({data?.rating || 0}) ratings</h3>
                 </div>
               </div>
-
               <div className={`${styles.button} bg-black !h-11 mt-6 !rounded-[4px]`}>
                 <span className="text-white flex items-center">
                   Send message <AiOutlineMessage className="ml-2" />
@@ -143,32 +127,28 @@ const ProductDetailsCart = ({ data, setOpen }) => {
                 ({data?.total_sell || 0}) Sold out
               </h5>
             </div>
-
-            {/* Right Column: Details, Qty, Wishlist, Add to cart */}
-            <div className="w-full 800px:w-[50%] pt-8 pl-[5px] pr-[5px]">
+            {/* Right Column: Product Details */}
+            <div className="w-full 800px:w-[50%] pt-8 pl-5 pr-5">
               <h1 className={`${styles.productTitle} text-[20px]`}>
                 {data?.name}
               </h1>
-
               <p className="mt-3">{data?.description}</p>
-
               <div className="flex mt-5">
                 {data?.discount_price ? (
-                  <h4 className={`${styles.productDiscountPrice}`}>
+                  <h4 className={styles.productDiscountPrice}>
                     ${data.discount_price}
                   </h4>
                 ) : (
-                  <h4 className={`${styles.productDiscountPrice}`}>
+                  <h4 className={styles.productDiscountPrice}>
                     ${data?.price}
                   </h4>
                 )}
                 {data?.price && data.discount_price && (
-                  <h3 className={`${styles.price}`}>
+                  <h3 className={styles.price}>
                     ${data.price}
                   </h3>
                 )}
               </div>
-
               <div className="flex items-center justify-between">
                 <div>
                   <button
@@ -177,11 +157,9 @@ const ProductDetailsCart = ({ data, setOpen }) => {
                   >
                     -
                   </button>
-
                   <span className="px-5 py-2 bg-gray-200 text-gray-800">
                     {count}
                   </span>
-
                   <button
                     className="bg-gradient-to-b from-emerald-600 to-emerald-400 text-white px-5 py-2 mt-8 text-[1rem]"
                     onClick={incrementCount}
@@ -189,7 +167,6 @@ const ProductDetailsCart = ({ data, setOpen }) => {
                     +
                   </button>
                 </div>
-
                 <div>
                   {isInWishlist ? (
                     <AiFillHeart
@@ -210,7 +187,6 @@ const ProductDetailsCart = ({ data, setOpen }) => {
                   )}
                 </div>
               </div>
-
               <div className="mt-6 select-none">
                 <button
                   className={`${styles.button} text-white !h-11 !rounded-[4px]`}
@@ -222,20 +198,7 @@ const ProductDetailsCart = ({ data, setOpen }) => {
             </div>
           </div>
         </motion.div>
-
-        {/* Toast message */}
-        <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover={false}
-          theme="light"
-        />
+        <ToastContainer position="top-right" autoClose={2000} />
       </div>
     </div>
   );

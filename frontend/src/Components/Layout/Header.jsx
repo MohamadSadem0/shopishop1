@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSectionsWithCategories } from "../../redux/slices/sectionSlice";
+import { fetchSectionsWithCategories } from "../../redux/slices/sectionSlice"; // Keep if you still use sections for dropdown
 import styles from "../../Styles/Style";
 import {
   AiOutlineHeart,
@@ -19,10 +19,11 @@ import ResponsiveHeader from "./ResponsiveHeader/ResponsiveHeader";
 
 const Header = ({ activeHeading }) => {
   const dispatch = useDispatch();
-  const { sectionsWithCategories, status: sectionStatus } = useSelector(
-    (state) => state.sections
-  );
-
+  const { sectionsWithCategories } = useSelector((state) => state.sections);
+  
+  // Get products from Redux for search functionality
+  const { products } = useSelector((state) => state.products);
+  
   // Local states
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
@@ -41,7 +42,9 @@ const Header = ({ activeHeading }) => {
 
   // Decide which link & button text (Login, Dashboard, etc.)
   const { dashboardRoute, buttonText } = (() => {
+    
     if (!user) {
+      
       return { dashboardRoute: "/login", buttonText: "Login" };
     }
     const userRole = role?.toUpperCase();
@@ -57,21 +60,19 @@ const Header = ({ activeHeading }) => {
     return { dashboardRoute: "/signup-seller", buttonText: "Become Seller" };
   })();
 
-  // Handle top search
+  // Handle top search by filtering products by name
   const handleSearch = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
-    // Filter categories from your sections data
-    const filteredCategories = sectionsWithCategories.flatMap((section) =>
-      section.categories.filter((category) =>
-        category.name.toLowerCase().includes(term.toLowerCase())
-      )
+    // Filter products based on the product name
+    const filteredProducts = products.filter((product) =>
+      product.name.toLowerCase().includes(term.toLowerCase())
     );
-    setSearchData(filteredCategories);
+    setSearchData(filteredProducts);
     setClick(term.length !== 0);
   };
 
-  // Fetch sections + categories on mount
+  // Fetch sections + categories on mount (if still needed elsewhere)
   useEffect(() => {
     dispatch(fetchSectionsWithCategories());
   }, [dispatch]);
@@ -87,11 +88,14 @@ const Header = ({ activeHeading }) => {
     <>
       {/* =============== Top Header =============== */}
       <div className={`${styles.section}`}>
-        {/* Use the style from your previous header */}
         <div className="hidden 800px:h-[50px] 800px:pt-12 800px:pb-12 800px:flex items-center justify-between">
           {/* Logo */}
           <Link to="/">
-            <img src={"https://res.cloudinary.com/dctv1qmij/image/upload/v1739464039/rih9vuuuyyndshhijwyh.png"} alt="Logo" className="w-[150px] h-[120px]" />
+            <img
+              src={"https://res.cloudinary.com/dctv1qmij/image/upload/v1739464039/rih9vuuuyyndshhijwyh.png"}
+              alt="Logo"
+              className="w-[150px] h-[120px]"
+            />
           </Link>
 
           {/* Search Box */}
@@ -101,7 +105,7 @@ const Header = ({ activeHeading }) => {
               className="w-full py-2 rounded border border-[#3957db] focus:outline-none pl-2"
               value={searchTerm}
               onChange={handleSearch}
-              placeholder="Search categories..."
+              placeholder="Search products..."
             />
             <AiOutlineSearch
               size={30}
@@ -110,13 +114,10 @@ const Header = ({ activeHeading }) => {
             />
             {click && searchData?.length > 0 && (
               <div className="absolute min-h-[30vh] shadow-sm-2 bg-slate-50 z-[9] p-4">
-                {searchData.map((category, i) => (
-                  <Link
-                    key={i}
-                    to={`/category/${category.name.replace(/\s+/g, "-")}`}
-                  >
+                {searchData.map((product, i) => (
+                  <Link key={i} to={`/product/${product.id}`}>
                     <div className="w-full flex items-center py-3">
-                      <h1>{category.name}</h1>
+                      <h1>{product.name}</h1>
                     </div>
                   </Link>
                 ))}
@@ -157,10 +158,8 @@ const Header = ({ activeHeading }) => {
           isScrolled ? "fixed top-0 left-0 shadow-sm z-10" : ""
         }`}
       >
-        <div
-          className={`${styles.section} ${styles.noramlFlex} relative justify-between`}
-        >
-          {/* ====== "All Sections" Dropdown Button ====== */}
+        <div className={`${styles.section} ${styles.noramlFlex} relative justify-between`}>
+          {/* "All Sections" Dropdown Button */}
           <div
             className="relative mt-[10px] w-[270px] h-[60px] hidden 1000px:flex items-center"
             onClick={() => setDropDown(!dropDown)}
@@ -169,10 +168,7 @@ const Header = ({ activeHeading }) => {
             <button className="w-full h-[100%] flex items-center justify-between font-sans pl-10 bg-white text-lg font-[500] rounded-t-md select-none">
               All Sections
             </button>
-            <IoIosArrowDown
-              size={20}
-              className="absolute right-2 top-4 cursor-pointer"
-            />
+            <IoIosArrowDown size={20} className="absolute right-2 top-4 cursor-pointer" />
             {dropDown && (
               <DropDown
                 sectionsWithCategories={sectionsWithCategories || []}
@@ -181,18 +177,15 @@ const Header = ({ activeHeading }) => {
             )}
           </div>
 
-          {/* ====== Main Navbar ====== */}
+          {/* Main Navbar */}
           <div className={`${styles.noramlFlex}`}>
             <Navbar active={activeHeading} />
           </div>
 
-          {/* ====== Icons: Wishlist, Cart, Profile ====== */}
+          {/* Icons: Wishlist, Cart, Profile */}
           <div className="flex">
             {/* Wishlist Icon */}
-            <div
-              className={`${styles.noramlFlex} cursor-pointer`}
-              onClick={() => setOpenWishlist(true)}
-            >
+            <div className={`${styles.noramlFlex} cursor-pointer`} onClick={() => setOpenWishlist(true)}>
               <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
               {wishlist && wishlist.length > 0 && (
                 <span className="ml-[-10px] mb-[20px] text-white text-sm">
@@ -202,10 +195,7 @@ const Header = ({ activeHeading }) => {
             </div>
 
             {/* Cart Icon */}
-            <div
-              className={`${styles.noramlFlex} ml-4 cursor-pointer`}
-              onClick={() => setOpenCart(true)}
-            >
+            <div className={`${styles.noramlFlex} ml-4 cursor-pointer`} onClick={() => setOpenCart(true)}>
               <AiOutlineShoppingCart size={30} color="rgb(255 255 255 / 83%)" />
               {cart && cart.length > 0 && (
                 <span className="ml-[-10px] mb-[20px] text-white text-sm">
@@ -228,7 +218,7 @@ const Header = ({ activeHeading }) => {
         </div>
       </div>
 
-      {/* =============== Overlays for Cart & Wishlist =============== */}
+      {/* Overlays for Cart & Wishlist */}
       {openCart && <Cart setOpenCart={setOpenCart} />}
       {openWishlist && <Wishlist setOpenWishlist={setOpenWishlist} />}
     </>

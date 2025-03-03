@@ -18,19 +18,18 @@ const Login = () => {
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await dispatch(loginUser({ email, password })).unwrap();
-      
-      // Show success message and redirect
-      toast.success(`Welcome back, ${response.username}!`);
+  
+      // Show the success message from the backend
+      toast.success(response.message);
       navigate("/");
-
     } catch (err) {
       toast.error(err || "Login failed. Please check your credentials.");
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -98,10 +97,15 @@ const Login = () => {
                   Remember me
                 </label>
               </div>
+              {/* Changed the Link to a button for consistency */}
               <div className="text-sm">
-                <Link to="/forget-password" className="font-medium text-blue-600 hover:text-blue-500">
+                <button
+                  type="button"
+                  onClick={() => navigate("/forget-password")}
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
                   Forgot your password?
-                </Link>
+                </button>
               </div>
             </div>
             <div>
@@ -115,7 +119,6 @@ const Login = () => {
                 {loading ? "Logging in..." : "Submit"}
               </button>
             </div>
-
             {/* Sign Up Link */}
             <div className={`${styles.noramlFlex} justify-center pt-4`}>
               <span className="text-gray-600 text-sm">Don't have an account?</span>
@@ -123,7 +126,6 @@ const Login = () => {
                 Sign up
               </Link>
             </div>
-
             {/* Back to Site Button */}
             <div className="flex justify-center pt-4">
               <Link to="/" className="text-blue-600 hover:underline text-sm">

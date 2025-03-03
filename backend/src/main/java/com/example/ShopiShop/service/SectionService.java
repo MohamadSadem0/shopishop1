@@ -1,7 +1,7 @@
 package com.example.ShopiShop.service;
 
 import com.example.ShopiShop.dto.*;
-import com.example.ShopiShop.exceptions.SectionAlreadyExistsException;
+import com.example.ShopiShop.exceptions.RessourceAlreadyExistException;
 import com.example.ShopiShop.models.Section;
 import com.example.ShopiShop.repositories.SectionRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class SectionService {
 
     public SectionResponse createSection(SectionRequest request) {
         sectionRepository.findByName(request.name()).ifPresent(s -> {
-            throw new SectionAlreadyExistsException();
+            throw new RessourceAlreadyExistException("Section");
         });
 
         Section section = Section.builder()

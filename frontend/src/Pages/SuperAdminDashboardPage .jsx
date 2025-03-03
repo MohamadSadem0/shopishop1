@@ -10,7 +10,7 @@ const SuperAdminDashboard = () => {
   const [active, setActive] = useState(1);
 
   return (
-    <>
+    <> 
       <DashboardHeader />
       <div className="flex w-full h-screen">
         {/* Fixed Sidebar */}

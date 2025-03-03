@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+// Basic user routes
 import {
   HomePage,
   ProductPage,
@@ -15,16 +16,6 @@ import {
   SellerSignUpPage,
   SellerLoginPage,
   SellerProfilePage,
-  DashboardPage,
-  AllCouponCodesPage,
-  AllEventsPage,
-  AllProductPage,
-  AllOrderPage,
-  SellerProfileSettings,
-  SellerMessagePage,
-  CreateProductPage,
-  CreateEventPage,
-  WithdrawMoneyPage,
   CheckoutPage,
   PaymentPage,
   OrderSuccessPage,
@@ -34,9 +25,25 @@ import {
   ForgetPasswordPage,
   SellerForgetPasswordPage,
 } from "./Routes";
-import SuperAdminDashboardPage from "./Pages/SuperAdminDashboardPage ";
-import SuperAdminDashboard from "./Pages/SuperAdminDashboardPage ";
 
+import ConfirmAccountPage from "./Pages/ConfirmAccountPage";
+
+// Dashboard and merchant pages
+import DashboardPage from "./Pages/DashboardPage";
+import AllCouponCodesPage from "./Pages/AllCouponCodesPage";
+import AllEventsPage from "./Pages/AllEventsPage";
+import AllProductPage from "./Pages/AllProductPage";
+import AllOrderPage from "./Pages/AllOrderPage";
+import SellerProfileSettings from "./Pages/SellerProfileSettings";
+import CreateProductPage from "./Pages/CreateProductPage";
+import CreateEventPage from "./Pages/CreateEventPage";
+import WithdrawMoneyPage from "./Pages/WithdrawMoneyPage";
+
+// NEW: Dashboard Update Quantity Page
+import DashboardUpdateQuantityPage from "./Pages/DashboardUpdateQuantityPage";
+
+// SuperAdmin Pages
+import SuperAdminDashboard from "./Pages/SuperAdminDashboardPage";
 import AllUsers from "./Pages/SuperAdmin/AllUsers";
 import AllStores from "./Pages/SuperAdmin/AllStores";
 import CreateSection from "./Pages/SuperAdmin/CreateSection";
@@ -45,32 +52,34 @@ import AllCategories from "./Pages/SuperAdmin/AllCategories";
 import AllSections from "./Pages/SuperAdmin/AllSections";
 import AllOrders from "./Pages/SuperAdmin/AllOrders";
 import Settings from "./Pages/SuperAdmin/Settings";
+
+// Import PrivateRoute and TokenChecker
+import PrivateRoute from "./Components/PrivateRoute";
 import TokenChecker from "./Components/TokenChecker";
 
-// Import PrivateRoute
-import PrivateRoute from "./Components/PrivateRoute";
-import { useEffect } from "react";
+import 'primereact/resources/themes/saga-blue/theme.css'; 
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+import ResetPasswordPage from "./Pages/ResetPasswordPage";
 
 const App = () => {
-  useEffect(()=>{
-    console.log();
-    
-  },[])
   return (
     <BrowserRouter>
       <TokenChecker />
       <Routes>
-        {/* basic user interface routes */}
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Basic Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductPage />} />
         <Route path="/best-selling" element={<BestSellingPage />} />
-        <Route path="/events" element={<EventsPage />} />
+        <Route path="/confirm" element={<ConfirmAccountPage />} />
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
 
-        {/* Protected route: Only logged in CUSTOMER can access */}
+        {/* Protected Routes (Customers & Merchants) */}
         <Route
           path="/profile"
           element={
@@ -79,8 +88,6 @@ const App = () => {
             </PrivateRoute>
           }
         />
-
-        {/* Protected route: Only logged in CUSTOMER can access inbox */}
         <Route
           path="/inbox"
           element={
@@ -90,12 +97,12 @@ const App = () => {
           }
         />
 
-        {/* seller account routes (public for signup/login) */}
+        {/* Seller Public Routes */}
         <Route path="/signup-seller" element={<SellerSignUpPage />} />
         <Route path="/login-seller" element={<SellerLoginPage />} />
         <Route path="/shop/:id" element={<SellerProfilePage />} />
 
-        {/* Protected route: Only logged in MERCHANT can access the dashboard */}
+        {/* Merchant Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -145,14 +152,6 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard-messages"
-          element={
-            <PrivateRoute allowedRoles={["MERCHANT"]}>
-              <SellerMessagePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/dashboard-create-product"
           element={
             <PrivateRoute allowedRoles={["MERCHANT"]}>
@@ -177,24 +176,31 @@ const App = () => {
           }
         />
 
-        {/* Checkout routes (if these should be private, wrap accordingly) */}
+        {/* NEW: Merchant Update Quantity Page */}
+        <Route
+          path="/dashboard-update-quantity"
+          element={
+            <PrivateRoute allowedRoles={["MERCHANT"]}>
+              <DashboardUpdateQuantityPage />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Checkout and Payment Routes */}
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/order/success" element={<OrderSuccessPage />} />
 
-        {/* order detail routes */}
+        {/* Order Detail Routes */}
         <Route path="/order/:id" element={<OrderDetailsPage />} />
         <Route path="/seller/order/:id" element={<SellerOrderDetailsPage />} />
         <Route path="/order/track/:id" element={<TrackOrderPage />} />
 
-        {/* forget password */}
+        {/* Forget Password */}
         <Route path="/forget-password" element={<ForgetPasswordPage />} />
-        <Route
-          path="/seller/forget-password"
-          element={<SellerForgetPasswordPage />}
-        />
+        <Route path="/seller/forget-password" element={<SellerForgetPasswordPage />} />
 
-        {/* Protected route: Only logged in SUPERADMIN can access superadmin-dashboard */}
+        {/* SuperAdmin Protected Routes */}
         <Route
           path="/superadmin-dashboard/*"
           element={

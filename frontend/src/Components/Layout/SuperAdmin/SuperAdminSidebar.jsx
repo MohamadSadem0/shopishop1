@@ -6,7 +6,7 @@ import { VscNewFile } from "react-icons/vsc";
 import { CiSettings } from "react-icons/ci";
 import { Link } from "react-router-dom";
 
-const SuperAdminSidebar = ({ active, setActive }) => {
+const SuperAdminSidebar = ({ active, setActive }) => { 
   return (
     <>
       <div className="w-full h-screen bg-white shadow-sm overflow-y-scroll top-0 left-0 py-5">
@@ -16,7 +16,7 @@ const SuperAdminSidebar = ({ active, setActive }) => {
             <MdOutlineDashboard size={25} color={active === 1 ? "#3957db" : "#555"} />
             <h5 className={` ${active === 1 ? "text-[#3957db]" : "#555"} pl-3 hidden 800px:block text-[18px] font-[600]`}>
               Dashboard
-            </h5>
+            </h5> 
           </Link>
         </div>
 

@@ -16,5 +16,6 @@ public record ProductResponse(
         Long storeId,
         boolean isAvailable,
         String storeName,
+        Integer quantity,
         List<ReviewResponse> reviews
 ) {}

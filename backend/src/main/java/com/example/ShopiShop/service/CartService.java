@@ -2,12 +2,14 @@ package com.example.ShopiShop.service;
 
 import com.example.ShopiShop.dto.CartItemRequest;
 import com.example.ShopiShop.dto.CartItemResponse;
+import com.example.ShopiShop.exceptions.InsufficientStockException;
 import com.example.ShopiShop.models.CartItem;
 import com.example.ShopiShop.models.Product;
 import com.example.ShopiShop.models.User;
 import com.example.ShopiShop.repositories.CartItemRepository;
 import com.example.ShopiShop.repositories.ProductRepository;
 import com.example.ShopiShop.repositories.UserRepository;
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,15 +63,29 @@ public class CartService {
             throw new RuntimeException("Unauthorized: You cannot modify another user's cart.");
         }
 
+        // Fetch the latest product details (with optimistic locking)
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
+        // Retrieve any existing cart item for this product
         CartItem cartItem = cartItemRepository.findByUser(user)
                 .stream()
                 .filter(item -> item.getProduct().getId().equals(request.productId()))
                 .findFirst()
                 .orElse(null);
 
+        // Calculate the new total quantity for this product in the cart
+        int newQuantity = request.quantity();
+        if (cartItem != null) {
+            newQuantity += cartItem.getQuantity();
+        }
+
+        // Validate available stock
+        if (newQuantity > product.getQuantity()) {
+            throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
+        }
+
+        // Create or update the cart item accordingly
         if (cartItem == null) {
             cartItem = CartItem.builder()
                     .user(user)
@@ -77,21 +93,24 @@ public class CartService {
                     .quantity(request.quantity())
                     .build();
         } else {
-            cartItem.setQuantity(cartItem.getQuantity() + request.quantity());
+            cartItem.setQuantity(newQuantity);
         }
 
-        CartItem savedCartItem = cartItemRepository.save(cartItem);
-
-        return new CartItemResponse(
-                savedCartItem.getId(),
-                savedCartItem.getProduct().getName(),
-                savedCartItem.getProduct().getId(),
-
-                savedCartItem.getProduct().getImageUrl(),
-                savedCartItem.getProduct().getPrice(),
-                savedCartItem.getQuantity()
-        );
+        try {
+            CartItem savedCartItem = cartItemRepository.save(cartItem);
+            return new CartItemResponse(
+                    savedCartItem.getId(),
+                    savedCartItem.getProduct().getName(),
+                    savedCartItem.getProduct().getId(),
+                    savedCartItem.getProduct().getImageUrl(),
+                    savedCartItem.getProduct().getPrice(),
+                    savedCartItem.getQuantity()
+            );
+        } catch (OptimisticLockException e) {
+            throw new RuntimeException("Concurrent update error. Please try again.");
+        }
     }
+
 
     // ✅ Remove item from cart
     @Transactional

@@ -2,10 +2,7 @@ package com.example.ShopiShop.service;
 
 import com.example.ShopiShop.dto.*;
 import com.example.ShopiShop.exceptions.ResourceNotFoundException;
-import com.example.ShopiShop.models.Category;
-import com.example.ShopiShop.models.Product;
-import com.example.ShopiShop.models.Review;
-import com.example.ShopiShop.models.Store;
+import com.example.ShopiShop.models.*;
 import com.example.ShopiShop.repositories.CategoryRepository;
 import com.example.ShopiShop.repositories.ProductRepository;
 import com.example.ShopiShop.repositories.StoreRepository;
@@ -14,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -27,6 +25,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final StoreRepository storeRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+
 
     @Transactional
     public ProductResponse createProduct(@Valid ProductRequest request) {
@@ -124,6 +124,7 @@ public class ProductService {
                 product.getStore().getId(),
                 product.getIsAvailable(),
                 product.getStore().getName(),
+                product.getQuantity(),
                 reviewResponses
         );
     }
@@ -204,4 +205,26 @@ public class ProductService {
         return mapToProductResponse(updatedProduct);
     }
 
+
+
+    @Transactional
+    public ProductResponse updateProductQuantity(UUID productId, UpdateProductQuantityRequest request, User currentUser) {
+        // Retrieve product or throw exception if not found
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        // Check if the current user is the owner of the product's store
+        if (!product.getStore().getOwner().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized: You are not the owner of this store");
+        }
+
+        // Update the product quantity
+        product.setQuantity(request.quantity());
+        Product updatedProduct = productRepository.save(product);
+
+        // Publish real-time stock update via WebSocket to notify all subscribed clients
+        messagingTemplate.convertAndSend("/topic/stockUpdates", new StockUpdate(product.getId(), product.getQuantity()));
+
+        return mapToProductResponse(updatedProduct);
+    }
 }

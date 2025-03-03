@@ -11,16 +11,22 @@ import java.util.Map;
 public class EmailVerificationService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String mailboxlayerApiKey = "YOUR_MAILBOXLAYER_API_KEY"; // Replace with your API key
+    private final String mailboxlayerApiKey = "b634e50b34a938899e292a9c52fdc414";
 
     public boolean verifyWithMailboxlayer(String email) {
         String url = "http://apilayer.net/api/check?access_key=" + mailboxlayerApiKey + "&email=" + email;
         ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            // Example response fields: format_valid, smtp_check, and score.
+            // Log the response for debugging (remove or reduce logging in production)
+            System.out.println("Mailboxlayer response: " + response.getBody());
+
             Boolean formatValid = (Boolean) response.getBody().get("format_valid");
-            Boolean smtpCheck = (Boolean) response.getBody().get("smtp_check");
-            return Boolean.TRUE.equals(formatValid) && Boolean.TRUE.equals(smtpCheck);
+            Boolean mxFound = (Boolean) response.getBody().get("mx_found");
+            // Optionally, you could check smtp_check, but many valid emails might have it set to false.
+            // Boolean smtpCheck = (Boolean) response.getBody().get("smtp_check");
+
+            // Accept email if format is valid and MX records are found
+            return Boolean.TRUE.equals(formatValid) && Boolean.TRUE.equals(mxFound);
         }
         return false;
     }

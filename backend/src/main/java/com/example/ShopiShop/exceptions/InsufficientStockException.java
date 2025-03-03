@@ -1,2 +1,7 @@
-package com.example.ShopiShop.exceptions;public class InsufficientStockException {
+package com.example.ShopiShop.exceptions;
+
+public class InsufficientStockException extends RuntimeException {
+    public InsufficientStockException(String message) {
+        super(message);
+    }
 }

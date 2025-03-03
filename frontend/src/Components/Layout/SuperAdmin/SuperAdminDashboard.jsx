@@ -3,7 +3,7 @@ import { BsGraphUp } from "react-icons/bs";
 import { MdOutlineCategory, MdOutlineDashboard } from "react-icons/md";
 import { FiUsers, FiSettings } from "react-icons/fi";
 import { AiOutlineFileDone } from "react-icons/ai";
-import styles from "../../../Styles/Style";
+import styles from "../../../Styles/Style"; 
 
 const SuperAdminDashboard = () => {
   return (

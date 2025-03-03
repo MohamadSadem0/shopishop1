@@ -1,6 +1,7 @@
 package com.example.ShopiShop.repositories;
 
 import com.example.ShopiShop.models.Order;
+import com.example.ShopiShop.models.Store;
 import com.example.ShopiShop.models.User;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserId(Long userId);
 
 
+
+    // This returns orders that contain at least one order item whose product belongs to the specified store.
+    List<Order> findDistinctByOrderItems_Product_Store(Store store);
     Optional<Order> findById(UUID uuid);
 }

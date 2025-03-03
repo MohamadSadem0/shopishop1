@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
 
@@ -17,19 +17,39 @@ const DropDown = ({ sectionsWithCategories = [], setDropDown }) => {
             onMouseEnter={() => setHoveredSection(section.id)}
             onMouseLeave={() => setHoveredSection(null)}
           >
-            {/* Section Row */}
-            <div className="w-full flex justify-between items-center px-4 py-3 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer">
-              <span>{section.name}</span>
-              {section.categories.length > 0 && <IoIosArrowForward />}
-            </div>
+            {section.categories.length === 0 ? (
+              // If no categories, make the entire row clickable to filter by section
+              <Link
+                to={`/products?section=${encodeURIComponent(section.name)}`}
+                className="w-full flex justify-between items-center px-4 py-3 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer"
+                onClick={() => setDropDown(false)}
+              >
+                <span>{section.name}</span>
+              </Link>
+            ) : (
+              // If there are categories, show the section row with an arrow
+              <div className="w-full flex justify-between items-center px-4 py-3 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer">
+                <span>{section.name}</span>
+                <IoIosArrowForward />
+              </div>
+            )}
 
-            {/* Categories Dropdown (Appears beside on hover) */}
+            {/* Categories Dropdown (appears on hover if there are categories) */}
             {hoveredSection === section.id && section.categories.length > 0 && (
               <div className="absolute top-0 left-full w-[250px] bg-white shadow-lg rounded-md p-3 border border-gray-200">
+                {/* Link to filter by the entire section */}
+                <Link
+                  to={`/products?section=${encodeURIComponent(section.name)}`}
+                  className="block px-3 py-2 text-gray-600 hover:text-blue-500 hover:bg-gray-100 rounded-md transition mb-2 font-medium"
+                  onClick={() => setDropDown(false)}
+                >
+                  All {section.name}
+                </Link>
+                <div className="border-t border-gray-200 mb-2"></div>
                 {section.categories.map((category) => (
                   <Link
                     key={category.id}
-                    to={`/category/${category.name.replace(/\s+/g, "-")}`}
+                    to={`/products?category=${encodeURIComponent(category.name)}`}
                     className="flex items-center px-3 py-2 text-gray-600 hover:text-blue-500 hover:bg-gray-100 rounded-md transition"
                     onClick={() => setDropDown(false)}
                   >

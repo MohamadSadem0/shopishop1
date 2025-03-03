@@ -1,9 +1,8 @@
 package com.example.ShopiShop.controller;
 
-import com.example.ShopiShop.dto.OrderRequest;
-import com.example.ShopiShop.dto.OrderResponse;
-import com.example.ShopiShop.dto.PaymentUpdateRequest;
+import com.example.ShopiShop.dto.*;
 import com.example.ShopiShop.models.Order;
+import com.example.ShopiShop.models.Store;
 import com.example.ShopiShop.models.User;
 import com.example.ShopiShop.repositories.UserRepository;
 import com.example.ShopiShop.service.OrderService;
@@ -14,7 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/customer/orders")
@@ -69,4 +70,57 @@ public class OrderController {
         Order updatedOrder = orderService.updatePaymentMethod(orderId, paymentUpdateRequest);
         return ResponseEntity.ok(updatedOrder);
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserOrderResponse>> getUserOrders() {
+        User currentUser = getCurrentAuthenticatedUser();
+        List<UserOrderResponse> orders = orderService.getUserOrderResponses(currentUser);
+        return ResponseEntity.ok(orders);
+    }
+
+    // New endpoint: Get orders relevant to the store owned by the authenticated user.
+    @GetMapping("/store")
+    public ResponseEntity<List<StoreOrderResponse>> getStoreOrders() {
+        User currentUser = getCurrentAuthenticatedUser();
+        // Ensure the authenticated user owns a store
+        if (currentUser.getStore() == null) {
+            throw new RuntimeException("User does not own a store");
+        }
+        Store store = currentUser.getStore();
+        List<StoreOrderResponse> responses = orderService.getStoreOrdersForStore(store);
+        return ResponseEntity.ok(responses);
+    }
+
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<UserOrderResponse> getOrderById(@PathVariable UUID orderId) {
+        Order order = orderService.getOrderById(orderId);
+
+        // Map OrderItems to their response DTO representation.
+        List<UserOrderItemResponse> orderItems = order.getOrderItems().stream()
+                .map(item -> new UserOrderItemResponse(
+                        item.getId(),
+                        item.getProduct().getName(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        item.getProduct().getImageUrl()
+                ))
+                .collect(Collectors.toList());
+
+        // Build the response DTO.
+        UserOrderResponse response = new UserOrderResponse(
+                order.getId(),
+                order.getOrderDate(),
+                order.getStatus(),
+                order.getTotalAmount(),
+                order.getTotalPrice(),
+                order.getShippingAddress(),
+                order.getCityAddress(),
+                orderItems
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

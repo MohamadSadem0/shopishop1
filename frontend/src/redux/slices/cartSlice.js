@@ -24,7 +24,6 @@ export const fetchCart = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` },
       });
       // Return entire cart array
-      console.log(response);
       
       return response.data || [];
     } catch (error) {

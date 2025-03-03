@@ -1,2 +1,3 @@
-package com.example.ShopiShop.dto;public class ForgotPasswordRequest {
-}
+package com.example.ShopiShop.dto;
+
+public record ForgotPasswordRequest(String email) {}

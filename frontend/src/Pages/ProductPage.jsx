@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPaginatedProducts, resetProducts } from "../redux/slices/productSlice";
@@ -8,21 +6,22 @@ import Header from "../Components/Layout/Header";
 import Product from "../Components/Layout/Product";
 import Footer from "../Components/Layout/Footer";
 import styles from "../Styles/Style";
-
 import { motion } from "framer-motion";
 
 const ProductPage = () => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const category = searchParams.get("category") || null;
+  const section = searchParams.get("section") || null;
 
   const { products, status, hasMore, page } = useSelector((state) => state.products);
   const observer = useRef();
 
   useEffect(() => {
     dispatch(resetProducts());
-    dispatch(fetchPaginatedProducts({ page: 0, category }));
-  }, [dispatch, category]);
+    // Pass both category and section to your fetch function
+    dispatch(fetchPaginatedProducts({ page: 0, category, section }));
+  }, [dispatch, category, section]);
 
   const lastProductRef = useCallback(
     (node) => {
@@ -31,13 +30,13 @@ const ProductPage = () => {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          dispatch(fetchPaginatedProducts({ page, category }));
+          dispatch(fetchPaginatedProducts({ page, category, section }));
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [status, hasMore, page, category, dispatch]
+    [status, hasMore, page, category, section, dispatch]
   );
 
   return (

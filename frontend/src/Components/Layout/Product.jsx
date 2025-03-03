@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import {
   AiFillHeart,
   AiFillStar,
@@ -12,26 +11,22 @@ import {
   AiOutlineShoppingCart,
   AiOutlineStar,
 } from "react-icons/ai";
-
 import ProductDetailsCart from "./ProductDetailsCart";
 import styles from "../../Styles/Style";
 import { removeFromWishlist, addToWishlist } from "../../redux/WishlistAction";
-import axios from "../../utils/axiosInstance1"; // Adjust import if needed
+import axios from "../../utils/axiosInstance1";
 
 const Product = ({ data }) => {
   const dispatch = useDispatch();
   const { wishlist } = useSelector((state) => state.wishlist);
-
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Check if in wishlist on mount or whenever wishlist updates
   useEffect(() => {
     if (!data) return;
     setClick(wishlist.some((item) => item.id === data.id));
   }, [wishlist, data]);
 
-  // Toggle wishlist
   const handleWishlistToggle = () => {
     setClick(!click);
     click
@@ -39,14 +34,13 @@ const Product = ({ data }) => {
       : dispatch(addToWishlist(data));
   };
 
-  // Add to Cart via backend (similar to ProductDetails)
   const handleAddToCart = async () => {
     if (!data?.id) return;
-
     try {
+      // Here we use default quantity = 1 for the card view.
       await axios.post("/customer/cart/add", {
         productId: data.id,
-        quantity: 1, // default quantity = 1
+        quantity: 1,
       });
       toast.success("Item added to cart!");
     } catch (error) {
@@ -55,12 +49,10 @@ const Product = ({ data }) => {
     }
   };
 
-  // If no product data, render nothing
   if (!data) return null;
 
   return (
     <div className="bg-white rounded-lg shadow-sm w-full h-[330px] relative p-3 cursor-pointer">
-      {/* Clicking the image or name => Product Details page */}
       <Link to={`/product/${data.id}`}>
         <img
           src={data.imageUrl || "/default-image.jpg"}
@@ -71,17 +63,17 @@ const Product = ({ data }) => {
 
       <Link to={`/product/${data.id}`}>
         <h5 className={`${styles.shop_name} select-none py-3`}>
-          {data.name}
+          Category: {data.categoryName}
         </h5>
       </Link>
 
       <Link to={`/product/${data.id}`}>
         <h4 className="pb-3 font-[500]">
+          Name:{" "}
           {data.name.length > 40 ? `${data.name.slice(0, 40)}...` : data.name}
         </h4>
-
-        {/* Example star rating UI */}
-        <div className="flex select-none">
+        <div className="flex select-none items-center">
+          <span className="mr-2 font-bold">Rating:</span>
           {[...Array(4)].map((_, i) => (
             <AiFillStar
               key={i}
@@ -94,27 +86,33 @@ const Product = ({ data }) => {
         </div>
       </Link>
 
-      {/* Price (check discount logic) */}
-      <div className="py-2 flex items-center select-none justify-between">
+      <div className="py-2 flex flex-col select-none">
         {data?.effectivePrice && data.effectivePrice < data.price ? (
           <>
-            <h5 className={styles.productDiscountPrice}>
-              ${data.effectivePrice.toFixed(2)}
-            </h5>
-            <h4 className={styles.price}>
-              ${data.price.toFixed(2)}
-            </h4>
+            <div className="flex items-center">
+              <span className="font-bold mr-1">Price:</span>
+              <span className={styles.productDiscountPrice}>
+                ${data.effectivePrice.toFixed(2)}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="font-bold mr-1">Original Price:</span>
+              <span className={styles.price}>
+                ${data.price.toFixed(2)}
+              </span>
+            </div>
           </>
         ) : (
-          <h5 className={styles.productDiscountPrice}>
-            ${data.price.toFixed(2)}
-          </h5>
+          <div className="flex items-center">
+            <span className="font-bold mr-1">Price:</span>
+            <span className={styles.productDiscountPrice}>
+              ${data.price.toFixed(2)}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* Wishlist & Cart Actions */}
       <div>
-        {/* Wishlist Toggle */}
         <button
           onClick={handleWishlistToggle}
           className="absolute top-8 right-3 cursor-pointer"
@@ -126,7 +124,6 @@ const Product = ({ data }) => {
           )}
         </button>
 
-        {/* Quick View */}
         <button
           onClick={() => setOpen(!open)}
           className="absolute top-16 right-3 cursor-pointer"
@@ -134,7 +131,6 @@ const Product = ({ data }) => {
           <AiOutlineEye size={22} color="#333" title="Quick view" />
         </button>
 
-        {/* Add to Cart */}
         <button
           onClick={handleAddToCart}
           className="absolute top-24 right-3 cursor-pointer"
@@ -142,7 +138,6 @@ const Product = ({ data }) => {
           <AiOutlineShoppingCart size={25} color="#333" title="Add to cart" />
         </button>
 
-        {/* Quick View Popup */}
         {open && <ProductDetailsCart setOpen={setOpen} data={data} />}
       </div>
 

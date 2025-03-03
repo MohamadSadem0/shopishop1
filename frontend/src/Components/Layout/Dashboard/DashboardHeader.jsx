@@ -62,7 +62,7 @@ const DashboardHeader = () => {
             </Link>
           </div>
 
-          <div className="800px:flex hidden  items-center mr-4">
+          {/* <div className="800px:flex hidden  items-center mr-4">
             <Link to="/dashboard-messages">
               <BiMessageSquareDetail
                 size={30}
@@ -71,7 +71,7 @@ const DashboardHeader = () => {
                 color="#4c4c4c"
               />
             </Link>
-          </div>
+          </div> */}
 
           <Link to={`/profile`}>
             <img

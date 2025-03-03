@@ -3,7 +3,6 @@ import MainDashboard from "./MainDashboard";
 import AllOrders from "./AllOrders";
 import AllProducts from "./AllProducts";
 import CreateProduct from "./CreateProduct";
-import AllEvents from "./AllEvents";
 import CreateEvent from "./CreateEvent";
 import WithdrawMoney from "./WithdrawMoney";
 import ShopInbox from "./ShopInbox";

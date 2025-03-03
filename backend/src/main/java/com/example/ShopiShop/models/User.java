@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-
+@Setter
 public class User implements UserDetails {
 
     @Id
@@ -54,7 +54,12 @@ public class User implements UserDetails {
 
     private boolean enabled = false;
 
+
+    @Setter
     private String confirmationToken;
+
+    @Column(name = "reset_password_token", nullable = true)
+    private String resetPasswordToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -89,4 +94,9 @@ public class User implements UserDetails {
     public void setUserRole(UserRoleEnum userRoleEnum) {
         this.userRole=userRoleEnum;
     }
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+
 }

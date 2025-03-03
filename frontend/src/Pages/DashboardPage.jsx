@@ -1,23 +1,23 @@
 import React, { useState } from "react";
+import { Outlet } from "react-router-dom"; // Make sure you have react-router-dom installed and set up
 import DashboardHeader from "../Components/Layout/Dashboard/DashboardHeader";
 import DashboardSidebar from "../Components/Layout/Dashboard/DashboardSidebar";
-import DashboardContent from "../Components/Layout/Dashboard/DashboardContent/DashboardContent";
-import { useSelector } from "react-redux";
 
 const DashboardPage = () => {
   const [active, setActive] = useState(1);
-  const { user } = useSelector((state) => state.auth);
 
   return (
-    <div className="overscroll-y-none">
+    <>
       <DashboardHeader />
-      <div className="flex w-full overflow-y-hidden">
-        <div className="w-[70px] 800px:w-[335px] overscroll-none">
-          <DashboardSidebar active={active} setActive={setActive} userRole={user?.userRole} />
+      <div className="flex w-full h-screen">
+        <div className="w-[70px] 800px:w-[335px] fixed left-0 top-0 h-screen bg-white shadow-lg">
+          <DashboardSidebar active={active} setActive={setActive} />
         </div>
-        <DashboardContent active={active} userRole={user?.userRole} />
+        <div className="ml-[70px] 800px:ml-[335px] flex-1 p-8 bg-gray-100 overflow-y-auto">
+          <Outlet />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

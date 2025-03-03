@@ -71,7 +71,6 @@ const Checkout = () => {
       // Post the order data to your backend API endpoint
       const response = await axios.post("/customer/orders/checkout", orderData, config);
 
-      console.log(orderData);
       
       // Assuming your backend responds with an order ID and message:
       const { orderId, message } = response.data;

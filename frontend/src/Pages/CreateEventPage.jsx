@@ -10,11 +10,11 @@ const CreateEventPage = () => {
       <DashboardHeader />
 
       <div className="flex w-full">
-        <div className="w-[80px] 800px:w-[335px]">
-          <DashboardSidebar active={6} />
+      <div className="w-[70px] 800px:w-[335px] fixed left-0 top-0 h-screen bg-white shadow-lg">
+      <DashboardSidebar active={6} />
         </div>
 
-        <div className="w-full mt-10 px-5 ">
+        <div className="ml-[70px] 800px:ml-[335px] flex-1 p-8 bg-gray-100 overflow-y-auto">
           <CreateEvent />
         </div>
       </div>

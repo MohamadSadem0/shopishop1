@@ -1,6 +1,7 @@
 package com.example.ShopiShop.controller;
 
 import com.example.ShopiShop.dto.*;
+import com.example.ShopiShop.models.User;
 import com.example.ShopiShop.service.ProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -115,6 +118,21 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Product updated successfully", response));
     }
 
+    @PutMapping("/update-quantity/{productId}")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProductQuantity(
+            @PathVariable UUID productId,
+            @Valid @RequestBody UpdateProductQuantityRequest request) {
 
+        // Retrieve the currently authenticated user from the security context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RuntimeException("User is not authenticated");
+        }
+        User currentUser = (User) authentication.getPrincipal();
+
+        ProductResponse response = productService.updateProductQuantity(productId, request, currentUser);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Product quantity updated successfully", response));
+    }
 
 }
