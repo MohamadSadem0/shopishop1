@@ -6,6 +6,7 @@ import {
   deleteProduct,
   applyDiscount,
   updateProduct,
+  updateProductQuantity, 
 } from "../../../../redux/slices/productSlice";
 import useCloudinaryUpload from "../../../../hooks/useCloudinaryUpload";
 import ReusableTable from "../../../ReusableTable"; // Adjust the import path as needed
@@ -22,9 +23,10 @@ const AllProducts = () => {
   const { products, status, error } = useSelector((state) => state.products);
   const { role, store } = useSelector((state) => state.auth);
 
-  // Modal states for discount and update
+  // Modal states for discount, update product and update quantity
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showQuantityModal, setShowQuantityModal] = useState(false); // NEW
   const [selectedProductId, setSelectedProductId] = useState(null);
 
   // State for discount data
@@ -45,6 +47,11 @@ const AllProducts = () => {
     storeId: "",
   });
 
+  // NEW: State for quantity update data
+  const [quantityData, setQuantityData] = useState({
+    quantity: "",
+  });
+
   // Use the Cloudinary upload hook
   const { uploadImage, loading: imageUploading } = useCloudinaryUpload();
 
@@ -53,7 +60,6 @@ const AllProducts = () => {
       dispatch(fetchProductsByStoreId(store.storeId));
     } else {
       dispatch(fetchAllProducts());
-      
     }
   }, [dispatch, role, store?.storeId]);
 
@@ -84,6 +90,15 @@ const AllProducts = () => {
     setShowUpdateModal(true);
   };
 
+  // NEW: Open quantity update modal and pre-fill with product's current quantity
+  const handleQuantityClick = (product) => {
+    setSelectedProductId(product.id);
+    setQuantityData({
+      quantity: product.quantity,
+    });
+    setShowQuantityModal(true);
+  };
+
   // Handle file change for updating image
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -101,16 +116,13 @@ const AllProducts = () => {
   const handleDiscountSubmit = async (e) => {
     e.preventDefault();
     if (!selectedProductId) return;
-
     const payload = {
       discountPrice: discountData.discountPrice ? parseFloat(discountData.discountPrice) : null,
       discountPercent: discountData.discountPercent ? parseFloat(discountData.discountPercent) : null,
       discountStartDate: discountData.discountStartDate || null,
       discountEndDate: discountData.discountEndDate || null,
     };
-
     await dispatch(applyDiscount({ productId: selectedProductId, discountData: payload })).unwrap();
-
     setShowDiscountModal(false);
     setDiscountData({
       discountPrice: "",
@@ -142,9 +154,27 @@ const AllProducts = () => {
     }
   };
 
+  // NEW: Handle quantity update submission
+  const handleQuantitySubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedProductId) return;
+    try {
+      await dispatch(
+        updateProductQuantity({ productId: selectedProductId, quantity: parseInt(quantityData.quantity, 10) })
+      ).unwrap();
+      alert("Product quantity updated successfully!");
+      setShowQuantityModal(false);
+      setQuantityData({ quantity: "" });
+      setSelectedProductId(null);
+    } catch (err) {
+      alert("Quantity update failed: " + err);
+    }
+  };
+
   const closeModal = () => {
     setShowDiscountModal(false);
     setShowUpdateModal(false);
+    setShowQuantityModal(false);
     setSelectedProductId(null);
     setDiscountData({
       discountPrice: "",
@@ -160,6 +190,7 @@ const AllProducts = () => {
       categoryName: "",
       storeId: "",
     });
+    setQuantityData({ quantity: "" });
   };
 
   // Merge the base product columns with an Actions column that uses our handlers
@@ -168,24 +199,31 @@ const AllProducts = () => {
     {
       header: "Actions",
       render: (product) => (
-        <div className="flex justify-center space-x-2">
+        <div className="flex flex-wrap justify-center gap-2">
           <button
             onClick={() => handleDelete(product.id)}
-            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
+            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
           >
             Delete
           </button>
           <button
             onClick={() => handleDiscountClick(product.id)}
-            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md"
+            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm"
           >
             Discount
           </button>
           <button
             onClick={() => handleEditClick(product)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
           >
             Edit
+          </button>
+          {/* NEW: Button to update quantity */}
+          <button
+            onClick={() => handleQuantityClick(product)}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm"
+          >
+            Update Quantity
           </button>
         </div>
       ),
@@ -206,19 +244,37 @@ const AllProducts = () => {
     onChange: (e) => setUpdateData({ ...updateData, [field.name]: e.target.value }),
   }));
 
-  return (
-    <div className="w-full h-full overflow-y-auto px-4">
-      <h2 className="text-3xl font-bold text-center mb-8">All Products</h2>
-      {status === "loading" && <p className="text-center text-gray-500">Loading products...</p>}
-      {status === "failed" && <p className="text-center text-red-500">{error}</p>}
+  // NEW: Build quantity fields for the quantity update modal
+  const quantityFields = [
+    {
+      label: "New Quantity",
+      name: "quantity",
+      type: "number",
+      placeholder: "Enter new quantity",
+      value: quantityData.quantity,
+      onChange: (e) => setQuantityData({ ...quantityData, quantity: e.target.value }),
+      required: true,
+      min: 0,
+    },
+  ];
 
-      {/* Table view for screens lg (1024px) and up */}
-      <div className="hidden lg:block">
+  return (
+    <div className="container mx-auto w-full h-full overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <h2 className="text-3xl font-bold text-center mb-8">All Products</h2>
+      {status === "loading" && (
+        <p className="text-center text-gray-500">Loading products...</p>
+      )}
+      {status === "failed" && (
+        <p className="text-center text-red-500">{error}</p>
+      )}
+
+      {/* Table view for medium screens and up */}
+      <div className="hidden md:block">
         <ReusableTable columns={productColumns} data={products} />
       </div>
 
-      {/* Card view for screens below lg */}
-      <div className="block lg:hidden">
+      {/* Card view for small screens */}
+      <div className="block md:hidden">
         <ReusableCard columns={productColumns} data={products} />
       </div>
 
@@ -240,6 +296,16 @@ const AllProducts = () => {
         onSubmit={handleUpdateSubmit}
         onClose={closeModal}
         submitLabel="Save"
+      />
+
+      {/* NEW: Quantity Update Modal */}
+      <ReusableFormModal
+        isVisible={showQuantityModal}
+        title="Update Product Quantity"
+        fields={quantityFields}
+        onSubmit={handleQuantitySubmit}
+        onClose={closeModal}
+        submitLabel="Update"
       />
     </div>
   );

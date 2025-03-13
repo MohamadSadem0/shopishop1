@@ -6,7 +6,9 @@ import com.example.ShopiShop.models.*;
 import com.example.ShopiShop.repositories.CategoryRepository;
 import com.example.ShopiShop.repositories.ProductRepository;
 import com.example.ShopiShop.repositories.StoreRepository;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -209,7 +211,6 @@ public class ProductService {
 
     @Transactional
     public ProductResponse updateProductQuantity(UUID productId, UpdateProductQuantityRequest request, User currentUser) {
-        // Retrieve product or throw exception if not found
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -218,13 +219,22 @@ public class ProductService {
             throw new RuntimeException("Unauthorized: You are not the owner of this store");
         }
 
-        // Update the product quantity
+        // Update the product quantity and log the state
         product.setQuantity(request.quantity());
-        Product updatedProduct = productRepository.save(product);
+        System.out.println("Updating product: " + product);
 
-        // Publish real-time stock update via WebSocket to notify all subscribed clients
-        messagingTemplate.convertAndSend("/topic/stockUpdates", new StockUpdate(product.getId(), product.getQuantity()));
-
-        return mapToProductResponse(updatedProduct);
+        // Save and publish the update
+        try {
+            Product updatedProduct = productRepository.save(product);
+            // Publish real-time stock update via WebSocket to notify subscribed clients
+            messagingTemplate.convertAndSend("/topic/stockUpdates", new StockUpdate(product.getId(), product.getQuantity()));
+            return mapToProductResponse(updatedProduct);
+        } catch (ConstraintViolationException e) {
+            e.getConstraintViolations().forEach(violation -> System.err.println(violation.getMessage()));
+            throw new RuntimeException("Validation error: " + e.getMessage());
+        } catch (OptimisticLockException e) {
+            throw new RuntimeException("Product was updated concurrently. Please try again.");
+        }
     }
+
 }

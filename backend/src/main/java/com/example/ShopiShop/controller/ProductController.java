@@ -118,12 +118,14 @@ public class ProductController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Product updated successfully", response));
     }
 
-    @PutMapping("/update-quantity/{productId}")
+    @PutMapping("/merchant/product/update-quantity/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProductQuantity(
             @PathVariable UUID productId,
             @Valid @RequestBody UpdateProductQuantityRequest request) {
 
-        // Retrieve the currently authenticated user from the security context
+        System.out.println(productId);
+        System.out.println(request);
+        // Retrieve authenticated user from Security Context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() ||
                 "anonymousUser".equals(authentication.getPrincipal())) {

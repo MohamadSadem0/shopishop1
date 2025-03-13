@@ -5,36 +5,7 @@ import { fetchAllProductsAPI, fetchProductsByStoreIdAPI, fetchPaginatedProductsA
 import axiosInstance from "../../utils/axiosInstance";
 
 
-export const applyDiscount = createAsyncThunk(
-  "products/applyDiscount",
-  async ({ productId, discountData }, { getState, rejectWithValue }) => {
-    try {
-      // If you have an auth token in Redux
-      const { token } = getState().auth || {};
-      if (!token) throw new Error("Authentication token is missing.");
 
-      // Example call: POST /merchant/product/apply-discount/{productId}
-      // with discountData in the body
-      const response = await axiosInstance.post(
-        `/merchant/product/apply-discount/${productId}`,
-        discountData,
-        {
-          headers: {
-            // If axiosInstance doesn't already attach your token, do it here:
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      // The backend returns { success, message, data: ProductResponse }
-      return response.data.data; // The updated product
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to apply discount."
-      );
-    }
-  }
-);
 export const fetchBestSellingProducts = createAsyncThunk(
   "products/fetchBestSellingProducts",
   async ({ page = 0, size = 10 }, { rejectWithValue }) => {
@@ -201,6 +172,59 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
+
+export const applyDiscount = createAsyncThunk(
+  "products/applyDiscount",
+  async ({ productId, discountData }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth || {};
+      if (!token) throw new Error("Authentication token is missing.");
+      const response = await axiosInstance.post(
+        `/merchant/product/apply-discount/${productId}`,
+        discountData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to apply discount."
+      );
+    }
+  }
+);
+
+// ... other thunks such as fetchBestSellingProducts, fetchBestDeals, etc.
+
+// NEW: Thunk to update product quantity (only available to the store owner)
+export const updateProductQuantity = createAsyncThunk(
+  "products/updateProductQuantity",
+  async ({ productId, quantity }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      console.log(productId);
+      
+      if (!token) throw new Error("Authentication token is missing.");
+      const response = await axiosInstance.put(
+        `/merchant/product/update-quantity/${productId}`,
+        { quantity:quantity },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.data; // The updated product
+    } catch (error) {
+      console.log(error);
+      
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update product quantity."
+      );
+    }
+  }
+);
+
+
 const productSlice = createSlice({
   name: "products",
   initialState: {
@@ -211,8 +235,6 @@ const productSlice = createSlice({
     selectedProduct: null,
     status: "idle",
     error: null,
-
-    // For pagination
     page: 1,
     hasMore: true,
     bestSellingPage: 0,
@@ -233,20 +255,34 @@ const productSlice = createSlice({
     .addCase(updateProduct.fulfilled, (state, action) => {
       state.status = "succeeded";
       const updatedProduct = action.payload;
-      // Update the product in the products array if it exists
       const index = state.products.findIndex((p) => p.id === updatedProduct.id);
       if (index !== -1) {
         state.products[index] = updatedProduct;
       }
-      // Also update selectedProduct if needed
-      if (
-        state.selectedProduct &&
-        state.selectedProduct.id === updatedProduct.id
-      ) {
+      if (state.selectedProduct && state.selectedProduct.id === updatedProduct.id) {
         state.selectedProduct = updatedProduct;
       }
     })
     .addCase(updateProduct.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload;
+    })
+    // New extraReducers for updateProductQuantity
+    .addCase(updateProductQuantity.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(updateProductQuantity.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      const updatedProduct = action.payload;
+      const index = state.products.findIndex((p) => p.id === updatedProduct.id);
+      if (index !== -1) {
+        state.products[index] = updatedProduct;
+      }
+      if (state.selectedProduct && state.selectedProduct.id === updatedProduct.id) {
+        state.selectedProduct = updatedProduct;
+      }
+    })
+    .addCase(updateProductQuantity.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.payload;
     })
