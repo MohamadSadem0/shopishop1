@@ -22,6 +22,7 @@ services:
     ports:
       - "8080:8080"   # HTTP port
       - "8443:8443"   # HTTPS port
+
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1"
       SPRING_DATASOURCE_USERNAME: "root"
@@ -38,5 +39,5 @@ services:
       timeout: 10s
       retries: 3
 
-volumes:
-  db_data:
+  volumes:
+    db_data:
