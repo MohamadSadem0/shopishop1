@@ -25,14 +25,4 @@ public class CorsConfig implements WebMvcConfigurer{
             }
         };
     }
-
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Allow all endpoints
-                .allowedOrigins("https://stunning-gelato-710ab3.netlify.app") // Allow only this origin
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
-                .allowedHeaders("*") // Allow all headers
-                .allowCredentials(true); // Allow credentials (e.g., cookies)
-    }
 }
