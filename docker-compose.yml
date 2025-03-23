@@ -7,30 +7,26 @@ services:
     environment:
       MYSQL_DATABASE: ShopiShop1
       MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_USER: shopiuser  # Optional: Create a non-root user for the app
-      MYSQL_PASSWORD: shopipassword  # Password for the non-root user
     ports:
-      - "3306:3306"  # Expose MySQL port to the host (optional, only for debugging)
+      - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql  # Persist MySQL data
-    networks:
-      - shopishop_network  # Connect to the custom network
+      - db_data:/var/lib/mysql
 
   backend:
     build:
-      context: ./backend  # Path to the Dockerfile for the backend
+      context: ./backend
       dockerfile: Dockerfile.backend
     container_name: shopishop_backend
     depends_on:
-      - db  # Ensure the database starts first
+      - db
     ports:
-      - "8080:8080"   # Expose HTTP port
-      - "8443:8443"   # Expose HTTPS port
+      - "8080:8080"   # HTTP port
+      - "8443:8443"   # HTTPS port
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1"
-      SPRING_DATASOURCE_USERNAME: "root"  # Use the root user or a custom user
+      SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "12345"
-      SPRING_PROFILES_ACTIVE: "prod"  # Use the production profile
+      SPRING_PROFILES_ACTIVE: "prod"
       SERVER_SSL_KEYSTORE: "/app/keystore.jks"  # Path to the keystore inside the container
       SERVER_SSL_KEYSTORE_PASSWORD: "123456"    # Password for the keystore
       SERVER_SSL_KEYSTORE_TYPE: "JKS"           # Keystore type
@@ -41,16 +37,6 @@ services:
       # SPRING_MAIL_PASSWORD: "some-app-password"
     volumes:
       - ./backend/keystore.jks:/app/keystore.jks  # Mount the keystore file
-    networks:
-      - shopishop_network  # Connect to the custom network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]  # Health check endpoint
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
-  db_data:  # Persist MySQL data
-
-networks:
-  shopishop_network:  # Create a custom network for the services
+  db_data:
