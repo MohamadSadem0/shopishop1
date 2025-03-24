@@ -1,3 +1,56 @@
+# version: '3.8'
+
+# services:
+#   db:
+#     image: mysql:8
+#     container_name: shopishop_db
+#     environment:
+#       MYSQL_DATABASE: ShopiShop1
+#       MYSQL_ROOT_PASSWORD: 12345
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+#   backend:
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile.backend
+#     container_name: shopishop_backend
+#     depends_on:
+#       - db
+#     ports:
+#       - "8080:8080"   # HTTP port
+#       - "8443:8443"   # HTTPS port
+#     environment:
+#       SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1"
+#       SPRING_DATASOURCE_USERNAME: "root"
+#       SPRING_DATASOURCE_PASSWORD: "12345"
+#       SPRING_PROFILES_ACTIVE: "prod"
+#       SERVER_SSL_KEYSTORE: "/app/keystore.jks"  # Path to the keystore inside the container
+#       SERVER_SSL_KEYSTORE_PASSWORD: "123456"    # Password for the keystore
+#       SERVER_SSL_KEYSTORE_TYPE: "JKS"           # Keystore type
+#       # Uncomment and replace with your real mail settings if desired
+#       # SPRING_MAIL_HOST: "smtp.gmail.com"
+#       # SPRING_MAIL_PORT: "587"
+#       # SPRING_MAIL_USERNAME: "some-email@gmail.com"
+#       # SPRING_MAIL_PASSWORD: "some-app-password"
+#       SERVER_SSL_ENABLED: "true"
+#       SERVER_SSL_KEY_STORE: "/app/keystore.p12"  # Changed to .p12 format
+#       SERVER_SSL_KEY_STORE_PASSWORD: "123456"
+#       SERVER_SSL_KEY_STORE_TYPE: "PKCS12"  # Changed to match .p12 format
+#     volumes:
+#       - ./backend/keystore.jks:/app/keystore.jks  # Mount the keystore file
+
+# volumes:
+#   db_data:
+
+
+#--------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 version: '3.8'
 
 services:
@@ -7,10 +60,17 @@ services:
     environment:
       MYSQL_DATABASE: ShopiShop1
       MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_USER: shopiuser  # Dedicated user
+      MYSQL_PASSWORD: 12345  # Same as root for simplicity
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   backend:
     build:
@@ -18,32 +78,44 @@ services:
       dockerfile: Dockerfile.backend
     container_name: shopishop_backend
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
-      - "8080:8080"   # HTTP port
-      - "8443:8443"   # HTTPS port
+      - "80:8080"   # HTTP redirect port
+      - "443:8443"  # HTTPS port
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1"
-      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1?useSSL=false&allowPublicKeyRetrieval=true"
+      SPRING_DATASOURCE_USERNAME: "shopiuser"
       SPRING_DATASOURCE_PASSWORD: "12345"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
       SPRING_PROFILES_ACTIVE: "prod"
-      SERVER_SSL_KEYSTORE: "/app/keystore.jks"  # Path to the keystore inside the container
-      SERVER_SSL_KEYSTORE_PASSWORD: "123456"    # Password for the keystore
-      SERVER_SSL_KEYSTORE_TYPE: "JKS"           # Keystore type
-      # Uncomment and replace with your real mail settings if desired
-      # SPRING_MAIL_HOST: "smtp.gmail.com"
-      # SPRING_MAIL_PORT: "587"
-      # SPRING_MAIL_USERNAME: "some-email@gmail.com"
-      # SPRING_MAIL_PASSWORD: "some-app-password"
+      
+      # SSL Configuration (use ONLY ONE format)
       SERVER_SSL_ENABLED: "true"
-      SERVER_SSL_KEY_STORE: "/app/keystore.p12"  # Changed to .p12 format
+      SERVER_SSL_KEY_STORE: "/app/keystore.p12"
       SERVER_SSL_KEY_STORE_PASSWORD: "123456"
-      SERVER_SSL_KEY_STORE_TYPE: "PKCS12"  # Changed to match .p12 format
+      SERVER_SSL_KEY_STORE_TYPE: "PKCS12"
+      
+      # HTTP→HTTPS redirect
+      SERVER_HTTP_PORT: "8080"
+      SERVER_HTTP_REDIRECT_PORT: "8443"
+      
     volumes:
-      - ./backend/keystore.jks:/app/keystore.jks  # Mount the keystore file
+      - ./backend/src/main/resources/keystore.p12:/app/keystore.p12:ro
+    restart: unless-stopped
 
 volumes:
   db_data:
+
+
+
+
+
+
+#--------------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 
 
