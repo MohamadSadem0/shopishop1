@@ -81,8 +81,8 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "80:8080"   # HTTP redirect port
-      - "443:8443"  # HTTPS port
+      - "8080:8080"  # HTTP
+      - "8443:8443"  # HTTPS
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1?useSSL=false&allowPublicKeyRetrieval=true"
       SPRING_DATASOURCE_USERNAME: "shopiuser"
