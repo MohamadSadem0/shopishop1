@@ -73,8 +73,8 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8080:8080"   # HTTP port
-      - "8443:8443"   # HTTPS port
+      - "8080:8080"  # HTTP
+      - "8443:8443"  # HTTPS
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1?useSSL=false&allowPublicKeyRetrieval=true"
       SPRING_DATASOURCE_USERNAME: "shopiuser"  # Using dedicated user
@@ -85,7 +85,7 @@ services:
       # SSL Configuration
       SERVER_SSL_ENABLED: "true"
       SERVER_SSL_KEY_STORE: "/app/keystore.p12"  # Changed to .p12 format
-      SERVER_SSL_KEY_STORE_PASSWORD: "your_password"
+      SERVER_SSL_KEY_STORE_PASSWORD: "123456"
       SERVER_SSL_KEY_STORE_TYPE: "PKCS12"  # Changed to match .p12 format
       
       # HTTP to HTTPS redirect
