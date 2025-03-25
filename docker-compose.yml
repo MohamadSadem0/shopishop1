@@ -32,6 +32,8 @@ services:
       - "443:8443"  # HTTPS
     environment:
       SPRING_PROFILES_ACTIVE: "prod"  # Critical for prod config
+      SERVER_PORT: "8443"  # Explicit internal port
+      SERVER_HTTP_PORT: "8080"  # HTTP redirect port
     volumes:
       - ./backend/src/main/resources/keystore.p12:/app/keystore.p12:ro
     restart: unless-stopped
