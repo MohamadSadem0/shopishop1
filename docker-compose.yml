@@ -28,13 +28,10 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "80:8080"   # HTTP → Redirects to HTTPS
-      - "443:8443"  # HTTPS (standard port)
+      - "80:8080"   # HTTP → Redirect
+      - "443:8443"  # HTTPS
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/ShopiShop1?useSSL=false"
-      SPRING_DATASOURCE_USERNAME: "shopiuser"
-      SPRING_DATASOURCE_PASSWORD: "12345"
-      SPRING_PROFILES_ACTIVE: "prod"
+      SPRING_PROFILES_ACTIVE: "prod"  # Critical for prod config
     volumes:
       - ./backend/src/main/resources/keystore.p12:/app/keystore.p12:ro
     restart: unless-stopped
