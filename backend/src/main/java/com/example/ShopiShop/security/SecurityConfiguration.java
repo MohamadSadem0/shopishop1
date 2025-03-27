@@ -29,7 +29,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-        .requiresChannel(channel -> 
+        .requiresChannel(channel ->
         channel.anyRequest().requiresSecure())
                 .csrf(csrf-> csrf.disable())  // Disable CSRF since you are using JWT
                 .authorizeHttpRequests(authorize -> authorize

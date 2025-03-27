@@ -18,6 +18,7 @@ const CreateProduct = () => {
   const [productDescription, setProductDescription] = useState("");
   const [price, setPrice] = useState("");
   const [categoryName, setCategoryName] = useState("");
+  const [quantity, setQuantity] = useState(1); // Added quantity state with default 1
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
 
@@ -27,7 +28,6 @@ const CreateProduct = () => {
   useEffect(() => {
     if (store?.sectionName) {
       dispatch(fetchCategoriesBySection(store.sectionName));
-      
     }
   }, [dispatch, store?.sectionName]);
 
@@ -61,7 +61,8 @@ const CreateProduct = () => {
       price,
       imageUrl,
       categoryName,
-      storeId: store?.storeId, // Assign storeId from Redux store
+      storeId: store?.storeId,
+      quantity: quantity || 1, // Include quantity in the payload
     };
 
     try {
@@ -148,6 +149,21 @@ const CreateProduct = () => {
               onChange={(e) => setPrice(e.target.value)}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="Enter product price..."
+            />
+          </div>
+
+          {/* Product Quantity - Added this new field */}
+          <div className="w-full 800px:w-[47%] mt-5">
+            <label className="pb-2">
+              Quantity <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="Enter product quantity..."
             />
           </div>
 

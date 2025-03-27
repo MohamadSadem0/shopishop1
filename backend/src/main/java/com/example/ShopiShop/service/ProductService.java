@@ -46,6 +46,7 @@ public class ProductService {
                 .category(category)
                 .store(store)
                 .isAvailable(true)
+                .quantity(request.quantity())
                 .build();
 
         Product savedProduct = productRepository.save(product);
