@@ -48,23 +48,8 @@ export const discountFieldsConfig = [
     name: "discountPrice",
     type: "number",
     step: "0.01",
-  },
-  {
-    label: "Discount Percent",
-    name: "discountPercent",
-    type: "number",
-    step: "0.01",
-  },
-  {
-    label: "Start Date",
-    name: "discountStartDate",
-    type: "date",
-  },
-  {
-    label: "End Date",
-    name: "discountEndDate",
-    type: "date",
-  },
+  }
+  
 ];
 
 export const updateFieldsConfig = [

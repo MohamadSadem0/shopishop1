@@ -23,6 +23,30 @@ export const fetchBestSellingProducts = createAsyncThunk(
     }
   }
 );
+
+
+export const removeDiscount = createAsyncThunk(
+  "products/removeDiscount",
+  async (productId, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth || {};
+      if (!token) throw new Error("Authentication token is missing.");
+      
+      const response = await axiosInstance.delete(
+        `/merchant/product/remove-discount/${productId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to remove discount."
+      );
+    }
+  }
+);
+
 // ------------------------------
 // 1) Best Deals Thunk
 // ------------------------------
@@ -176,6 +200,8 @@ export const deleteProduct = createAsyncThunk(
 export const applyDiscount = createAsyncThunk(
   "products/applyDiscount",
   async ({ productId, discountData }, { getState, rejectWithValue }) => {
+    console.log(discountData);
+    
     try {
       const { token } = getState().auth || {};
       if (!token) throw new Error("Authentication token is missing.");
@@ -283,6 +309,24 @@ const productSlice = createSlice({
       }
     })
     .addCase(updateProductQuantity.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload;
+    })
+    .addCase(removeDiscount.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(removeDiscount.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      const updatedProduct = action.payload;
+      const index = state.products.findIndex((p) => p.id === updatedProduct.id);
+      if (index !== -1) {
+        state.products[index] = updatedProduct;
+      }
+      if (state.selectedProduct && state.selectedProduct.id === updatedProduct.id) {
+        state.selectedProduct = updatedProduct;
+      }
+    })
+    .addCase(removeDiscount.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.payload;
     })

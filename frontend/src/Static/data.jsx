@@ -169,6 +169,19 @@ export const brandingData = [
 ];
 
 
+// Update the discountFields to only have newPrice
+const discountFields = [
+  {
+    label: "New Price",
+    name: "discountedPrice",
+    type: "number",
+    placeholder: "Enter discounted price",
+    required: true,
+    min: 0.01,
+    step: "0.01"
+  }
+];
+
 // product Data
 export const productData = [
   {

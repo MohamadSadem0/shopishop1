@@ -3,11 +3,13 @@ package com.example.ShopiShop.controller;
 import com.example.ShopiShop.dto.*;
 import com.example.ShopiShop.models.User;
 import com.example.ShopiShop.service.ProductService;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -100,14 +102,36 @@ public class ProductController {
 
     // In ProductController
     @PostMapping("/merchant/product/apply-discount/{productId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> applyProductDiscount(
+    public ResponseEntity<ApiResponse<ProductResponse>> applyDiscount(
             @PathVariable UUID productId,
-            @RequestBody DiscountRequest discountRequest // see below
-    ) {
-        ProductResponse updated = productService.applyDiscount(productId, discountRequest);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Discount applied", updated));
+            @Valid @RequestBody DiscountRequest request) {
+
+        try {
+            ProductResponse response = productService.applyDiscount(productId, request);
+            String message = request.discountValue().compareTo(BigDecimal.ZERO) == 0 ?
+                    "Discount removed successfully" :
+                    "Discount applied successfully: " + formatDiscountMessage(request);
+
+            return ResponseEntity.ok(new ApiResponse<>(true, message, response));
+        } catch (OptimisticLockException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiResponse<>(false, "Product was modified concurrently. Please try again.", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(new ApiResponse<>(false, "Failed to apply discount: " + e.getMessage(), null));
+        }
     }
 
+    private String formatDiscountMessage(DiscountRequest request) {
+        return switch (request.discountType()) {
+            case PERCENTAGE -> request.discountValue() + "% off";
+            case FIXED_AMOUNT -> "$" + request.discountValue() + " off";
+            default -> "Special discount applied";
+        };
+    }
     // Update Product (Admin/Merchant Only)
 // Update Product (Admin/Merchant Only)
     @PutMapping("/merchant/product/update/{id}")

@@ -1,2 +1,7 @@
-package com.example.ShopiShop.enums;public class DiscountType {
+package com.example.ShopiShop.enums;
+
+public enum DiscountType {
+    PERCENTAGE,
+    FIXED_AMOUNT
+
 }

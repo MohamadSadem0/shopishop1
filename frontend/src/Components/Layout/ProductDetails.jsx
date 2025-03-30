@@ -5,11 +5,12 @@ import axios from "../../utils/axiosInstance1";
 import ReactImageMagnify from "react-image-magnify";
 import { motion } from "framer-motion";
 import {
-  AiFillHeart,
-  AiOutlineHeart,
-  AiOutlineMessage,
-  AiOutlineShoppingCart,
-} from "react-icons/ai";
+  FaHeart,
+  FaRegHeart,
+  FaShoppingCart,
+  FaStar,
+  FaRegStar
+} from "react-icons/fa";
 import { addToWishlist, removeFromWishlist } from "../../redux/WishlistAction";
 import ProductDetailsInfo from "./ProductDetailsInfo.jsx";
 import styles from "../../Styles/Style";
@@ -24,6 +25,26 @@ const ProductDetails = ({ data }) => {
     if (!data) return;
     setIsInWishlist(wishlist?.some((item) => item.id === data.id));
   }, [wishlist, data]);
+
+  // Check if discount is currently active
+  const isDiscountValid = () => {
+    if (!data?.hasActiveDiscount) return false;
+    const now = new Date();
+    return (!data.discountStartDate || new Date(data.discountStartDate) <= now) &&
+           (!data.discountEndDate || new Date(data.discountEndDate) >= now);
+  };
+
+  // Format discount display
+  const formatDiscount = () => {
+    if (!data?.hasActiveDiscount) return null;
+    
+    if (data.discountType === "PERCENTAGE") {
+      return `${data.discountValue}% OFF`;
+    } else if (data.discountType === "FIXED_AMOUNT") {
+      return `$${data.discountValue} OFF`;
+    }
+    return data.discountName || "Special Offer";
+  };
 
   const incrementCount = () => {
     if (data?.quantity && count >= data.quantity) {
@@ -57,17 +78,23 @@ const ProductDetails = ({ data }) => {
     }
   };
 
-  const handleWishlistAddItem = () => {
-    setIsInWishlist(true);
-    dispatch(addToWishlist(data));
-  };
-
-  const handleWishlistRemoveItem = () => {
-    setIsInWishlist(false);
-    dispatch(removeFromWishlist(data));
+  const toggleWishlist = () => {
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(data));
+      toast.success("Removed from wishlist");
+    } else {
+      dispatch(addToWishlist(data));
+      toast.success("Added to wishlist");
+    }
+    setIsInWishlist(!isInWishlist);
   };
 
   if (!data) return null;
+
+  // Calculate average rating
+  const averageRating = data.reviews?.length > 0 
+    ? data.reviews.reduce((sum, review) => sum + review.rating, 0) / data.reviews.length 
+    : 0;
 
   return (
     <div className="bg-white">
@@ -92,9 +119,13 @@ const ProductDetails = ({ data }) => {
                       },
                       largeImage: {
                         src: data.imageUrl,
-                        width: 450,
-                        height: 800,
+                        width: 1200,
+                        height: 1800,
                       },
+                      enlargedImageContainerDimensions: {
+                        width: '150%',
+                        height: '100%'
+                      }
                     }}
                   />
                 ) : (
@@ -126,72 +157,141 @@ const ProductDetails = ({ data }) => {
               transition={{ duration: 0.5 }}
               className="w-full 800px:w-[50%] mt-0 800px:mt-9 ml-0 800px:ml-5"
             >
-              <h1 className={styles.productTitle}>{data?.name}</h1>
-              <p className="mt-2">{data?.description}</p>
-              <div className="flex mt-3">
-                {data?.effectivePrice && data.effectivePrice < data.price ? (
+              <div className="flex justify-between items-start">
+                <h1 className={styles.productTitle}>{data?.name}</h1>
+                <button
+                  onClick={toggleWishlist}
+                  className="text-2xl"
+                >
+                  {isInWishlist ? (
+                    <FaHeart className="text-red-500" />
+                  ) : (
+                    <FaRegHeart className="text-gray-500 hover:text-red-500" />
+                  )}
+                </button>
+              </div>
+
+              <p className="text-gray-600 mb-2">{data?.categoryName}</p>
+
+              {/* Rating */}
+              {averageRating > 0 && (
+                <div className="flex items-center mb-3">
+                  <div className="flex mr-2">
+                    {Array(5).fill(0).map((_, i) => (
+                      i < Math.round(averageRating) ? 
+                        <FaStar key={i} className="text-yellow-400" /> : 
+                        <FaRegStar key={i} className="text-yellow-400" />
+                    ))}
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    ({data.reviews?.length || 0} reviews)
+                  </span>
+                </div>
+              )}
+
+              <p className="mt-2 text-gray-700">{data?.description}</p>
+
+              {/* Price Display */}
+              <div className="flex items-center mt-4 gap-3">
+                {data.hasActiveDiscount && isDiscountValid() && data.discountedPrice ? (
                   <>
                     <h4 className={styles.productDiscountPrice}>
-                      ${data.effectivePrice.toFixed(2)}
+                      ${data.discountedPrice.toFixed(2)}
                     </h4>
                     <h3 className={styles.price}>
-                      ${data.price?.toFixed(2)}
+                      ${data.price.toFixed(2)}
                     </h3>
+                    <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                      {formatDiscount()}
+                    </span>
                   </>
                 ) : (
                   <h4 className={styles.productDiscountPrice}>
-                    ${data?.price?.toFixed(2)}
+                    ${data.price.toFixed(2)}
                   </h4>
                 )}
               </div>
 
-              {/* Quantity and Wishlist */}
-              <div className="flex items-center justify-between">
-                <div>
+              {/* Discount Details */}
+              {data.hasActiveDiscount && isDiscountValid() && (
+                <div className="mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                  <h4 className="font-semibold text-yellow-800">Special Offer</h4>
+                  <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+                    <div>
+                      <span className="text-gray-600">Discount:</span>{' '}
+                      <span className="font-medium">
+                        {data.discountType === 'PERCENTAGE'
+                          ? `${data.discountValue}%`
+                          : `$${data.discountValue}`}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Valid Until:</span>{' '}
+                      <span className="font-medium">
+                        {data.discountEndDate
+                          ? new Date(data.discountEndDate).toLocaleDateString()
+                          : 'No expiry'}
+                      </span>
+                    </div>
+                    {data.discountMinQuantity > 1 && (
+                      <div className="col-span-2">
+                        <span className="text-gray-600">Minimum Quantity:</span>{' '}
+                        <span className="font-medium">{data.discountMinQuantity}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Stock Status */}
+              <div className="mt-3">
+                <span className={`text-sm ${
+                  data.quantity > 0 ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {data.quantity > 0 
+                    ? `${data.quantity} available in stock` 
+                    : 'Out of stock'}
+                </span>
+              </div>
+
+              {/* Quantity Selector */}
+              {data.quantity > 0 && (
+                <div className="flex items-center mt-6">
+                  <span className="mr-3 font-medium">Quantity:</span>
                   <button
-                    className="bg-gradient-to-b from-emerald-600 to-emerald-400 text-white px-5 py-2 mt-8 text-[1rem]"
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-l"
                     onClick={decrementCount}
                   >
                     -
                   </button>
-                  <span className="px-5 py-2 bg-gray-200 text-gray-800">
+                  <span className="bg-gray-100 px-4 py-1">
                     {count}
                   </span>
                   <button
-                    className="bg-gradient-to-b from-emerald-600 to-emerald-400 text-white px-5 py-2 mt-8 text-[1rem]"
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-r"
                     onClick={incrementCount}
                   >
                     +
                   </button>
                 </div>
-                <div>
-                  {isInWishlist ? (
-                    <AiFillHeart
-                      size={30}
-                      color="red"
-                      onClick={handleWishlistRemoveItem}
-                      className="cursor-pointer"
-                      title="Remove from wishlist"
-                    />
-                  ) : (
-                    <AiOutlineHeart
-                      size={30}
-                      color="#333"
-                      onClick={handleWishlistAddItem}
-                      className="cursor-pointer"
-                      title="Add to wishlist"
-                    />
-                  )}
-                </div>
-              </div>
+              )}
 
               {/* Add to Cart Button */}
               <div className="mt-6 select-none">
                 <button
-                  className={`${styles.button} text-white !h-11 !rounded-[4px]`}
+                  className={`${styles.button} text-white !h-11 !rounded-[4px] flex items-center justify-center ${
+                    data.quantity <= 0 ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                   onClick={addToCartHandler}
+                  disabled={data.quantity <= 0}
                 >
-                  Add to cart <AiOutlineShoppingCart className="ml-2" />
+                  {data.quantity > 0 ? (
+                    <>
+                      Add to cart <FaShoppingCart className="ml-2" />
+                    </>
+                  ) : (
+                    "Out of Stock"
+                  )}
                 </button>
               </div>
             </motion.div>

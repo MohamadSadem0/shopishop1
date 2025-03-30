@@ -6,7 +6,7 @@ import ProductReview from "./ProductReview";
 
 const ProductDetailsInfo = ({ data }) => {
   const [active, setActive] = useState(1);
-
+ 
   return (
     <div className="bg-[#f5f6fb] px-3 py-2 800px:px-10 rounded mt-10">
       <div className="flex items-center justify-between w-full border-b pt-10 pb-2 ">

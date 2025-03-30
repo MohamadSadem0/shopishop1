@@ -1,6 +1,6 @@
 package com.example.ShopiShop.models;
 
-
+import com.example.ShopiShop.enums.DiscountType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,14 +32,13 @@ public class Product {
     private String description;
 
     @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    private BigDecimal price = BigDecimal.ZERO;
 
     @Column(name = "image", nullable = false)
     private String imageUrl;
 
-    // New field for available quantity
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Integer quantity = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", referencedColumnName = "id", nullable = false)
@@ -53,37 +52,48 @@ public class Product {
     private List<Review> reviews;
 
     @Version
-    private Integer version;
+    @Column(nullable = false)
+    private Integer version = 0;
 
+    @Column(nullable = false)
     private Boolean isAvailable = false;
-    // Tracks how many times the product has been sold
+
+    @Column(nullable = false)
     private Integer totalSell = 0;
-
-    // Basic discount fields
-    private BigDecimal discountPrice;
-    private Double discountPercent;
-
-    private LocalDate discountStartDate;
-    private LocalDate discountEndDate;
 
     @Column(name = "time_created")
     @CreationTimestamp
     private Timestamp createdAt;
 
-    public BigDecimal getEffectivePrice() {
-        LocalDate now = LocalDate.now();
-        if (discountStartDate != null && discountEndDate != null
-                && now.isAfter(discountStartDate.minusDays(1))
-                && now.isBefore(discountEndDate.plusDays(1))) {
+    @Enumerated(EnumType.STRING)
+    private DiscountType discountType;
 
-            if (discountPrice != null) {
-                return discountPrice;
-            }
-            if (discountPercent != null && discountPercent > 0) {
-                BigDecimal discount = price.multiply(BigDecimal.valueOf(discountPercent / 100.0));
-                return price.subtract(discount);
-            }
+    @Column(precision = 19, scale = 2)
+    private BigDecimal discountValue = BigDecimal.ZERO;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal discountPrice = BigDecimal.ZERO;
+
+    private LocalDate discountStartDate;
+    private LocalDate discountEndDate;
+    private String discountName;
+
+    @Column(nullable = false)
+    private Boolean discountActive = false;
+
+    private Integer discountMinQuantity = 1;
+
+    public BigDecimal getEffectivePrice() {
+        if (discountPrice == null || !discountActive) {
+            return price;
         }
-        return price;
+
+        LocalDate now = LocalDate.now();
+        boolean isDateValid = (discountStartDate == null || !now.isBefore(discountStartDate)) &&
+                (discountEndDate == null || !now.isAfter(discountEndDate));
+
+        return isDateValid ? discountPrice : price;
     }
+
+    // Getters and setters are handled by @Data from Lombok
 }
