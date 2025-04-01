@@ -1,9 +1,11 @@
 package com.example.ShopiShop.repositories;
 
 import com.example.ShopiShop.models.Product;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
@@ -25,24 +27,19 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findTop10ByOrderByTotalSellDesc();
     Page<Product> findAllByOrderByTotalSellDesc(Pageable pageable);
 
-    // Custom queries only where needed
-    @Query("SELECT p FROM Product p WHERE " +
-            "LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
-    Page<Product> searchByNameIgnoreCase(@Param("name") String name, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.discountActive = true AND " +
+            "(p.discountStartDate IS NULL OR p.discountStartDate <= CURRENT_DATE) AND " +
+            "(p.discountEndDate IS NULL OR p.discountEndDate >= CURRENT_DATE)")
+    List<Product> findActiveDiscountProducts();
 
-    @Query("SELECT p FROM Product p WHERE " +
-            "(p.discountPrice IS NOT NULL) AND " +
-            "(p.discountStartDate <= CURRENT_DATE OR p.discountStartDate IS NULL) AND " +
-            "(p.discountEndDate >= CURRENT_DATE OR p.discountEndDate IS NULL) " +
-            "ORDER BY (p.price - p.discountPrice) DESC")
-    Page<Product> findDiscountedProducts(Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.discountActive = true AND p.discountPrice IS NOT NULL " +
+            "ORDER BY (p.price - p.discountPrice) DESC LIMIT 10")
+    List<Product> findTopDiscountProducts();
 
-    @Query("SELECT p FROM Product p WHERE " +
-            "p.quantity < :threshold AND p.store.id = :storeId")
-    Page<Product> findLowStockProducts(@Param("storeId") Long storeId,
-                                       @Param("threshold") int threshold,
-                                       Pageable pageable);
+    List<Product> findByDiscountActiveTrue();
 
-    List<Product> findByDiscountStartDateAndDiscountActiveFalse(LocalDate date);
-    List<Product> findByDiscountEndDateBeforeAndDiscountActiveTrue(LocalDate date);
+    List<Product> findByStoreIdAndDiscountActiveTrueAndDiscountEndDateBefore(
+            Long storeId,
+            LocalDate endDate
+    );
 }

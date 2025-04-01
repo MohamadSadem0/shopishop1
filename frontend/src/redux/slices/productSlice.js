@@ -139,6 +139,8 @@ export const fetchPaginatedProducts = createAsyncThunk(
     try {
       const response = await fetchPaginatedProductsAPI(page, 10, category);
 
+      console.log(response);
+      
       return {
         products: response.content || [],  // ✅ Extract `content`
         hasMore: !response.last, // ✅ Check if there are more pages
@@ -157,6 +159,8 @@ export const fetchProductsByStoreId = createAsyncThunk(
     try {
       if (!storeId) throw new Error("Store ID is missing.");
       const response = await fetchProductsByStoreIdAPI(storeId);
+      console.log(response);
+      
       return response.data || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch products for this store.");

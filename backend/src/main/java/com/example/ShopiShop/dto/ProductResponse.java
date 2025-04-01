@@ -11,45 +11,18 @@ public record ProductResponse(
         UUID id,
         String name,
         String description,
-        BigDecimal price,
+        BigDecimal originalPrice,  // Always shows the base price
+        BigDecimal finalPrice,     // Shows price after discount (or original if no discount)
         String imageUrl,
         String categoryName,
-        BigDecimal effectivePrice,
         Long storeId,
         boolean isAvailable,
         String storeName,
         Integer quantity,
         List<ReviewResponse> reviews,
-
-        // Enhanced discount fields
-        boolean hasActiveDiscount,
-        @Nullable LocalDate discountStartDate,
-        @Nullable LocalDate discountEndDate,
-        @Nullable String discountName,
-        @Nullable DiscountType discountType,
-        @Nullable BigDecimal discountValue,
-        @Nullable BigDecimal discountedPrice,
-        @Nullable Integer discountMinQuantity,
-
-        // Additional product metrics
         Integer totalSell,
-        @Nullable Double averageRating
-) {
-        public String getFormattedDiscount() {
-                if (!hasActiveDiscount) return null;
+        @Nullable Double averageRating,
+        @Nullable DiscountInfo discountInfo,  // Details about the active discount
+        @Nullable BigDecimal discountValue
+) {}
 
-                if (discountType == DiscountType.PERCENTAGE) {
-                        return discountValue + "% OFF";
-                } else if (discountType == DiscountType.FIXED_AMOUNT) {
-                        return "$" + discountValue + " OFF";
-                }
-                return discountName != null ? discountName : "Special Offer";
-        }
-
-        public boolean isDiscountValid() {
-                if (!hasActiveDiscount) return false;
-                LocalDate now = LocalDate.now();
-                return (discountStartDate == null || !now.isBefore(discountStartDate)) &&
-                        (discountEndDate == null || !now.isAfter(discountEndDate));
-        }
-}

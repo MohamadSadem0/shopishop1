@@ -1,4 +1,3 @@
-import {getDecryptedToken} from "../utils/decryptToken";
 import axiosInstance from "../utils/axiosInstance";
 
 /**
@@ -29,6 +28,8 @@ export const createCategoryAPI = async (category, token) => {
  * @returns {Object} The created product.
  */
 export const createProductAPI = async (productData,token) => {
+    console.log(productData);
+    
     try {
       if (!token) throw new Error('No token found');
 

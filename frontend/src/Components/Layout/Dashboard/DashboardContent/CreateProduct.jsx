@@ -63,6 +63,7 @@ const CreateProduct = () => {
       categoryName,
       storeId: store?.storeId,
       quantity: quantity || 1, // Include quantity in the payload
+      discountActive:false,
     };
 
     try {

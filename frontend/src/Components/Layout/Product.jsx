@@ -37,7 +37,6 @@ const Product = ({ data }) => {
   const handleAddToCart = async () => {
     if (!data?.id) return;
     try {
-      // Here we use default quantity = 1 for the card view.
       await axios.post("/customer/cart/add", {
         productId: data.id,
         quantity: 1,
@@ -51,8 +50,22 @@ const Product = ({ data }) => {
 
   if (!data) return null;
 
+  // Calculate discount percentage if available
+  const discountPercentage = data.discountValue && data.discountInfo?.discountType === DiscountType.PERCENTAGE
+    ? data.discountValue
+    : data.discountValue && data.originalPrice.compareTo(BigDecimal.ZERO) > 0
+      ? data.discountValue.divide(data.originalPrice, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
+      : null;
+
   return (
-    <div className="bg-white rounded-lg shadow-sm w-full h-[330px] relative p-3 cursor-pointer">
+    <div className="bg-white rounded-lg shadow-sm w-full h-[370px] relative p-3 cursor-pointer">
+      {/* Discount badge */}
+      {data.discountValue && (
+        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+          {discountPercentage}% OFF
+        </div>
+      )}
+
       <Link to={`/product/${data.id}`}>
         <img
           src={data.imageUrl || "/default-image.jpg"}
@@ -63,42 +76,49 @@ const Product = ({ data }) => {
 
       <Link to={`/product/${data.id}`}>
         <h5 className={`${styles.shop_name} select-none py-3`}>
-          Category: {data.categoryName}
+          {data.categoryName}
         </h5>
-      </Link>
-
-      <Link to={`/product/${data.id}`}>
         <h4 className="pb-3 font-[500]">
-          Name:{" "}
           {data.name.length > 40 ? `${data.name.slice(0, 40)}...` : data.name}
         </h4>
         <div className="flex select-none items-center">
           <span className="mr-2 font-bold">Rating:</span>
-          {[...Array(4)].map((_, i) => (
-            <AiFillStar
-              key={i}
-              size={20}
-              color="#f6Ba00"
-              className="mr-2 cursor-pointer"
-            />
+          {[...Array(5)].map((_, i) => (
+            i < Math.floor(data.averageRating || 0) ? (
+              <AiFillStar
+                key={i}
+                size={20}
+                color="#f6Ba00"
+                className="mr-1 cursor-pointer"
+              />
+            ) : (
+              <AiOutlineStar
+                key={i}
+                size={20}
+                color="#f6Ba00"
+                className="mr-1 cursor-pointer"
+              />
+            )
           ))}
-          <AiOutlineStar size={20} color="#f6Ba00" className="mr-2 cursor-pointer" />
+          <span className="text-sm text-gray-500 ml-1">
+            ({data.reviews?.length || 0})
+          </span>
         </div>
       </Link>
 
       <div className="py-2 flex flex-col select-none">
-        {data?.effectivePrice && data.effectivePrice < data.price ? (
+        {data.finalPrice.compareTo(data.originalPrice) < 0 ? (
           <>
             <div className="flex items-center">
               <span className="font-bold mr-1">Price:</span>
               <span className={styles.productDiscountPrice}>
-                ${data.effectivePrice.toFixed(2)}
+                ${data.finalPrice.toFixed(2)}
               </span>
             </div>
             <div className="flex items-center">
-              <span className="font-bold mr-1">Original Price:</span>
-              <span className={styles.price}>
-                ${data.price.toFixed(2)}
+              <span className="font-bold mr-1">Original:</span>
+              <span className="line-through text-gray-500">
+                ${data.originalPrice.toFixed(2)}
               </span>
             </div>
           </>
@@ -106,9 +126,17 @@ const Product = ({ data }) => {
           <div className="flex items-center">
             <span className="font-bold mr-1">Price:</span>
             <span className={styles.productDiscountPrice}>
-              ${data.price.toFixed(2)}
+              ${data.originalPrice.toFixed(2)}
             </span>
           </div>
+        )}
+      </div>
+
+      <div className="absolute bottom-3 left-3 text-xs text-gray-500">
+        {data.quantity > 0 ? (
+          <span className="text-green-600">In Stock ({data.quantity})</span>
+        ) : (
+          <span className="text-red-600">Out of Stock</span>
         )}
       </div>
 
@@ -116,32 +144,39 @@ const Product = ({ data }) => {
         <button
           onClick={handleWishlistToggle}
           className="absolute top-8 right-3 cursor-pointer"
+          aria-label={click ? "Remove from wishlist" : "Add to wishlist"}
         >
           {click ? (
-            <AiFillHeart size={22} color="red" title="Remove from wishlist" />
+            <AiFillHeart size={22} color="red" />
           ) : (
-            <AiOutlineHeart size={22} color="#333" title="Add to wishlist" />
+            <AiOutlineHeart size={22} color="#333" />
           )}
         </button>
 
         <button
           onClick={() => setOpen(!open)}
           className="absolute top-16 right-3 cursor-pointer"
+          aria-label="Quick view"
         >
-          <AiOutlineEye size={22} color="#333" title="Quick view" />
+          <AiOutlineEye size={22} color="#333" />
         </button>
 
         <button
           onClick={handleAddToCart}
           className="absolute top-24 right-3 cursor-pointer"
+          disabled={data.quantity <= 0}
+          aria-label="Add to cart"
         >
-          <AiOutlineShoppingCart size={25} color="#333" title="Add to cart" />
+          <AiOutlineShoppingCart 
+            size={25} 
+            color={data.quantity <= 0 ? "#ccc" : "#333"} 
+          />
         </button>
 
         {open && <ProductDetailsCart setOpen={setOpen} data={data} />}
       </div>
 
-      <ToastContainer />
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </div>
   );
 };

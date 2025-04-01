@@ -10,6 +10,8 @@ import sectionReducer from ".//slices/sectionSlice";
 import categorYReducer from ".//slices/categorySlice";
 import productReducer from ".//slices/productSlice";
 import orderReducer from ".//slices/orderSlice";
+import discountReducer from ".//slices/discountSlice";
+
 
 const persistConfig = {
   key: "root",
@@ -26,7 +28,9 @@ const rootReducer = combineReducers({
   sections: sectionReducer,
   category:categorYReducer,
   products:productReducer,
-  order:orderReducer
+  order:orderReducer,
+  discount: discountReducer
+
 });
 
 // **Apply Persist to Root Reducer**

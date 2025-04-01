@@ -7,7 +7,8 @@ const ProductCard = ({
   onDiscount, 
   onEdit, 
   onUpdateQuantity,
-  onRemoveDiscount 
+  onRemoveDiscount,
+  isMerchant
 }) => {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -29,13 +30,11 @@ const ProductCard = ({
   };
 
   // Check if discount is currently valid
-  const isDiscountValid = product.hasActiveDiscount && 
-    (!product.discountStartDate || new Date() >= new Date(product.discountStartDate)) &&
-    (!product.discountEndDate || new Date() <= new Date(product.discountEndDate));
+  const isDiscountValid = product.discountInfo !== null;
 
   // Calculate discount percentage
-  const discountPercentage = isDiscountValid && product.price && product.discountedPrice ?
-    Math.round(((product.price - product.discountedPrice) / product.price) * 100) : 0;
+  const discountPercentage = isDiscountValid && product.originalPrice && product.finalPrice ?
+    Math.round(((product.originalPrice - product.finalPrice) / product.originalPrice) * 100) : 0;
 
   // Format price with currency
   const formatPrice = (price) => {
@@ -62,15 +61,13 @@ const ProductCard = ({
           <div className="absolute top-3 left-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-r-md shadow-lg z-10 flex items-center">
             <FaTag className="mr-1.5" />
             <span className="font-semibold">
-              {product.discountType === "PERCENTAGE" 
-                ? `${product.discountValue}% OFF` 
-                : product.discountType === "FIXED_AMOUNT" 
-                  ? `${formatPrice(product.discountValue)} OFF` 
-                  : product.discountName || "SALE"}
+              {product.discountInfo.discountType === "PERCENTAGE" 
+                ? `${product.discountInfo.discountValue}% OFF` 
+                : `${formatPrice(product.discountInfo.discountValue)} OFF`}
             </span>
-            {product.discountEndDate && (
+            {product.discountInfo.endDate && (
               <span className="ml-2 text-[0.65rem] font-normal bg-white/20 px-1 py-0.5 rounded">
-                Ends {formatDate(product.discountEndDate)}
+                Ends {formatDate(product.discountInfo.endDate)}
               </span>
             )}
           </div>
@@ -113,14 +110,14 @@ const ProductCard = ({
             <div className="flex items-baseline gap-2 flex-wrap">
               {/* Current Price */}
               <span className={`text-xl font-bold ${isDiscountValid ? 'text-red-600' : 'text-gray-900'}`}>
-                {formatPrice(product.discountedPrice || product.price)}
+                {formatPrice(product.finalPrice)}
               </span>
               
               {/* Original Price */}
-              {isDiscountValid && product.price && (
+              {isDiscountValid && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500 line-through">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.originalPrice)}
                   </span>
                   <span className="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded-full font-medium">
                     Save {discountPercentage}%
@@ -183,11 +180,9 @@ const ProductCard = ({
                 {isDiscountValid && (
                   <span className="ml-3 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-md flex items-center">
                     <FaTag className="mr-1" />
-                    {product.discountType === "PERCENTAGE" 
-                      ? `${product.discountValue}% OFF` 
-                      : product.discountType === "FIXED_AMOUNT" 
-                        ? `${formatPrice(product.discountValue)} OFF` 
-                        : product.discountName || "SALE"}
+                    {product.discountInfo.discountType === "PERCENTAGE" 
+                      ? `${product.discountInfo.discountValue}% OFF` 
+                      : `${formatPrice(product.discountInfo.discountValue)} OFF`}
                   </span>
                 )}
               </h2>
@@ -224,7 +219,7 @@ const ProductCard = ({
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Original Price:</span>
-                      <span className="font-medium">{formatPrice(product.price)}</span>
+                      <span className="font-medium">{formatPrice(product.originalPrice)}</span>
                     </div>
                     
                     {isDiscountValid && (
@@ -232,28 +227,28 @@ const ProductCard = ({
                         <div className="flex justify-between">
                           <span className="text-gray-600">Discount:</span>
                           <span className="font-medium text-green-600">
-                            {product.discountType === "PERCENTAGE" 
-                              ? `${product.discountValue}%` 
-                              : formatPrice(product.discountValue)}
+                            {product.discountInfo.discountType === "PERCENTAGE" 
+                              ? `${product.discountInfo.discountValue}%` 
+                              : formatPrice(product.discountInfo.discountValue)}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">You Save:</span>
                           <span className="font-medium text-green-600">
-                            {formatPrice(product.price - (product.discountedPrice || 0))} ({discountPercentage}%)
+                            {formatPrice(product.originalPrice - product.finalPrice)} ({discountPercentage}%)
                           </span>
                         </div>
-                        {product.discountStartDate && (
+                        {product.discountInfo.startDate && (
                           <div className="flex justify-between">
                             <span className="text-gray-600">Discount Started:</span>
-                            <span>{formatDate(product.discountStartDate)}</span>
+                            <span>{formatDate(product.discountInfo.startDate)}</span>
                           </div>
                         )}
-                        {product.discountEndDate && (
+                        {product.discountInfo.endDate && (
                           <div className="flex justify-between">
                             <span className="text-gray-600">Discount Ends:</span>
                             <span className="text-red-500 font-medium">
-                              {formatDate(product.discountEndDate)}
+                              {formatDate(product.discountInfo.endDate)}
                             </span>
                           </div>
                         )}
@@ -263,7 +258,7 @@ const ProductCard = ({
                     <div className="pt-2 mt-2 border-t border-gray-200 flex justify-between">
                       <span className="text-gray-800 font-semibold">Final Price:</span>
                       <span className={`text-xl font-bold ${isDiscountValid ? 'text-red-600' : 'text-gray-900'}`}>
-                        {formatPrice(product.discountedPrice || product.price)}
+                        {formatPrice(product.finalPrice)}
                       </span>
                     </div>
                   </div>
@@ -348,62 +343,65 @@ const ProductCard = ({
                   )}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(product.id);
-                      toggleDetails();
-                    }}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
-                  >
-                    Delete Product
-                  </button>
-                  {isDiscountValid ? (
+                {/* Action Buttons - Only show for merchants */}
+                {isMerchant && (
+                  <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onRemoveDiscount(product.id);
+                        onDelete(product.id);
                         toggleDetails();
                       }}
-                      className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
                     >
-                      Remove Discount
+                      Delete Product
                     </button>
-                  ) : (
+                    {isDiscountValid ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRemoveDiscount(product.id);
+                          toggleDetails();
+                        }}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
+                      >
+                        Remove Discount
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDiscount(product);
+                          toggleDetails();
+                        }}
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
+                      >
+                        Add Discount
+                      </button>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDiscount(product);
+                        onEdit(product);
                         toggleDetails();
                       }}
-                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
                     >
-                      Add Discount
+                      Edit Product
                     </button>
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(product);
-                      toggleDetails();
-                    }}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
-                  >
-                    Edit Product
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUpdateQuantity(product);
-                      toggleDetails();
-                    }}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
-                  >
-                    Update Stock
-                  </button>
-                </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdateQuantity(product);
+                        toggleDetails();
+                      }}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
+                      disabled={!product.isAvailable}
+                    >
+                      Update Stock
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -31,6 +31,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
+    @ExceptionHandler(DiscountOperationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDiscountOperation(DiscountOperationException ex) {
+        return ResponseEntity.badRequest()
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
 
+    @ExceptionHandler(DiscountConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDiscountConflict(DiscountConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
 
 }

@@ -1,2 +1,4 @@
-package com.example.ShopiShop.service;public class ProductDiscountService {
+package com.example.ShopiShop.service;
+
+public class ProductDiscountService {
 }

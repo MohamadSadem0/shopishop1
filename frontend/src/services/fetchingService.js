@@ -169,7 +169,7 @@ export const fetchProductsByStoreIdAPI = async (storeId) => {
   try {
 
     
-    const response = await axiosInstance.get(`/public/products/${storeId}`
+    const response = await axiosInstance.get(`/public/products/store/${storeId}`
 
   );
     return response.data; 

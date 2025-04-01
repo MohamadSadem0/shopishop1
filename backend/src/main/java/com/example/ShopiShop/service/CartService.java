@@ -21,6 +21,7 @@ import java.util.UUID;
 public class CartService {
 
     private final CartItemRepository cartItemRepository;
+    private  DiscountService discountService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
@@ -49,7 +50,7 @@ public class CartService {
                         cartItem.getProduct().getName(),
                         cartItem.getProduct().getId(),
                         cartItem.getProduct().getImageUrl(),
-                        cartItem.getProduct().getEffectivePrice(),
+                        discountService.calculateEffectivePrice(cartItem.getProduct()),
                         cartItem.getQuantity()
                 ))
                 .toList();

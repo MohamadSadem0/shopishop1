@@ -26,6 +26,8 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private  DiscountService discountService;
+
 
     public OrderService(OrderRepository orderRepository, ProductRepository productRepository, CartItemRepository cartItemRepository, SimpMessagingTemplate messagingTemplate) {
         this.orderRepository = orderRepository;
@@ -65,10 +67,11 @@ public class OrderService {
                 throw new RuntimeException("Product " + product.getName() + " was updated by another transaction. Please try again.");
             }
 
+
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
                     .quantity(orderQuantity)
-                    .price(product.getEffectivePrice())
+                    .price(discountService.calculateEffectivePrice(product))
                     .build();
             orderItems.add(orderItem);
         }

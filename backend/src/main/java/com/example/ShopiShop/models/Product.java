@@ -16,7 +16,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "product")
+@Table(name = "product", indexes = {
+        @Index(name = "idx_product_discount_active", columnList = "discountActive"),
+        @Index(name = "idx_product_discount_dates", columnList = "discountStartDate,discountEndDate")
+})
 public class Product {
 
     @Id
@@ -31,7 +34,7 @@ public class Product {
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Column(name = "price", nullable = false)
+    @Column(name = "price", nullable = false, precision = 19, scale = 2)
     private BigDecimal price = BigDecimal.ZERO;
 
     @Column(name = "image", nullable = false)
@@ -83,17 +86,28 @@ public class Product {
 
     private Integer discountMinQuantity = 1;
 
-    public BigDecimal getEffectivePrice() {
-        if (discountPrice == null || !discountActive) {
-            return price;
-        }
+    // Add these methods to your Product entity
+    public boolean isDiscountCurrentlyActive() {
+        if (!discountActive) return false;
 
         LocalDate now = LocalDate.now();
-        boolean isDateValid = (discountStartDate == null || !now.isBefore(discountStartDate)) &&
-                (discountEndDate == null || !now.isAfter(discountEndDate));
-
-        return isDateValid ? discountPrice : price;
+        boolean started = discountStartDate == null || !now.isBefore(discountStartDate);
+        boolean notEnded = discountEndDate == null || !now.isAfter(discountEndDate);
+        return started && notEnded;
     }
 
-    // Getters and setters are handled by @Data from Lombok
+    // In Product entity
+
+    public BigDecimal calculateCurrentPrice() {
+        return isDiscountCurrentlyActive() ?
+                (discountPrice != null ? discountPrice : calculateDiscountedPrice()) :
+                price;
+    }
+
+
+    private BigDecimal calculateDiscountedPrice() {
+        return discountType == DiscountType.PERCENTAGE ?
+                price.subtract(price.multiply(discountValue).divide(BigDecimal.valueOf(100))) :
+                price.subtract(discountValue);
+    }
 }
