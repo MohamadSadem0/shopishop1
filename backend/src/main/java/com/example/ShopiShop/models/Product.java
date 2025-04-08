@@ -75,7 +75,7 @@ public class Product {
     private BigDecimal discountValue = BigDecimal.ZERO;
 
     @Column(precision = 19, scale = 2)
-    private BigDecimal discountPrice = BigDecimal.ZERO;
+    private BigDecimal discountPrice ;
 
     private LocalDate discountStartDate;
     private LocalDate discountEndDate;

@@ -13,12 +13,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
@@ -71,18 +74,47 @@ public class ProductService {
         return mapToProductResponse(product);
     }
 
-    public List<ProductResponse> getProductsByStoreId(Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store not found"));
+//    public List<ProductResponse> getProductsByStoreId(Long storeId) {
+//        Store store = storeRepository.findById(storeId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Store not found"));
+//
+//        List<Product> products = productRepository.findByStoreId(storeId);
+//        if (products.isEmpty()) {
+//            throw new ResourceNotFoundException("No products found for this store");
+//        }
+//
+//        return products.stream()
+//                .map(this::mapToProductResponse)
+//                .toList();
+//    }
 
-        List<Product> products = productRepository.findByStoreId(storeId);
-        if (products.isEmpty()) {
-            throw new ResourceNotFoundException("No products found for this store");
+
+    public Page<ProductResponse> getProductsByStoreId(
+            Long storeId,
+            int page,
+            int size,
+            UUID cursorId,
+            LocalDateTime cursorDate) {
+
+        Page<Product> productPage;
+
+        if (cursorId == null || cursorDate == null) {
+            // First page load
+            productPage = productRepository.findByStoreIdFirstPage(
+                    storeId,
+                    PageRequest.of(page, size, Sort.by("createdAt").descending().and(Sort.by("id").descending()))
+            );
+        } else {
+            // Subsequent pages with cursor
+            productPage = productRepository.findByStoreIdAfterCursor(
+                    storeId,
+                    cursorId,
+                    cursorDate,
+                    PageRequest.of(0, size) // Always page 0 for cursor-based
+            );
         }
 
-        return products.stream()
-                .map(this::mapToProductResponse)
-                .toList();
+        return productPage.map(this::mapToProductResponse);
     }
 
     @Transactional
@@ -399,6 +431,52 @@ public class ProductService {
                                 ChronoUnit.DAYS.between(LocalDate.now(), product.getDiscountEndDate()) : null
                 ))
                 .toList();
+    }
+
+    public Page<ProductResponse> getPaginatedProducts(int page, int size, String category, UUID lastSeenId, LocalDateTime lastSeenDate) {
+        PageRequest pageRequest = PageRequest.of(0, size); // Always query first page for cursor
+
+        List<Product> products = productRepository.findNextPage(
+                category,
+                lastSeenId,
+                lastSeenDate,
+                pageRequest
+        );
+
+        // Map to DTO with only essential fields
+        return new PageImpl<>(
+                products.stream()
+                        .map(this::mapToProductPreviewResponse) // Lightweight mapping
+                        .toList(),
+                pageRequest,
+                products.size()
+        );
+    }
+
+    private ProductResponse mapToProductPreviewResponse(Product product) {
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                null, // Skip description for listings
+                product.getPrice(),
+                product.getDiscountValue(),
+                product.getImageUrl(),
+                product.getCategory().getName(),
+                product.getStore().getId(),
+                product.getIsAvailable(),
+                null, // Skip store name for listings
+                product.getQuantity(),
+                null, // Skip reviews for listings
+                product.getTotalSell(),
+                null, // Skip rating for listings
+                product.getDiscountActive() ?
+                        new DiscountInfo(
+                                product.getDiscountType(),
+                                product.getDiscountValue(),
+                                null, null, null, 1// Minimal discount info
+                        ) : null,
+                product.getDiscountValue()
+        );
     }
 
 }

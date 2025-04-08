@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -106,5 +108,35 @@ public class DiscountService {
      */
     public void clearDiscountCache(UUID productId) {
         discountCache.invalidate(productId);
+    }
+
+    public Map<UUID, BigDecimal> calculateBulkEffectivePrices(List<Product> products) {
+        Map<UUID, BigDecimal> results = new HashMap<>();
+        LocalDate now = LocalDate.now();
+
+        products.forEach(product -> {
+            // Check cache first
+            BigDecimal cachedPrice = discountCache.getIfPresent(product.getId());
+            if (cachedPrice != null) {
+                results.put(product.getId(), cachedPrice);
+                return;
+            }
+
+            // Calculate fresh price
+            BigDecimal effectivePrice = product.getPrice();
+
+            if (product.getDiscountActive() &&
+                    product.getDiscountPrice() != null &&
+                    (product.getDiscountStartDate() == null || !now.isBefore(product.getDiscountStartDate())) &&
+                    (product.getDiscountEndDate() == null || !now.isAfter(product.getDiscountEndDate()))) {
+
+                effectivePrice = calculateDiscountedPrice(product);
+                discountCache.put(product.getId(), effectivePrice);
+            }
+
+            results.put(product.getId(), effectivePrice);
+        });
+
+        return results;
     }
 }

@@ -24,6 +24,39 @@ export const fetchBestSellingProducts = createAsyncThunk(
   }
 );
 
+export const fetchStoreProducts = createAsyncThunk(
+  "products/fetchStoreProducts",
+  async ({ storeId, page = 0, size = 10, cursorId, cursorDate }, { rejectWithValue }) => {
+    try {
+      const params = { page, size };
+      if (cursorId && cursorDate) {
+        params.cursorId = cursorId;
+        params.cursorDate = cursorDate;
+      }
+
+
+      const response = await axiosInstance.get(`/public/products/store/${storeId}`, {
+        params
+      });
+      
+      return {
+        products: response.data.content || [],
+        hasMore: !response.data.last,
+        page: response.data.number,
+        cursorId: response.data.content.length > 0 
+          ? response.data.content[response.data.content.length - 1].id 
+          : null,
+        cursorDate: response.data.content.length > 0
+          ? response.data.content[response.data.content.length - 1].createdAt
+          : null
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch store products."
+      );
+    }
+  }
+);
 
 export const removeDiscount = createAsyncThunk(
   "products/removeDiscount",
@@ -152,16 +185,51 @@ export const fetchPaginatedProducts = createAsyncThunk(
   }
 );
 
-// ✅ Fetch products by Store ID (For merchants)
+// // ✅ Fetch products by Store ID (For merchants)
+// export const fetchProductsByStoreId = createAsyncThunk(
+//   "products/fetchProductsByStoreId",
+//   async (storeId, { rejectWithValue }) => {
+//     try {
+//       if (!storeId) throw new Error("Store ID is missing.");
+//       const response = await fetchProductsByStoreIdAPI(storeId);
+//       console.log(response);
+      
+//       return response.data.content || [];
+//     } catch (error) {
+//       return rejectWithValue(error.response?.data?.message || "Failed to fetch products for this store.");
+//     }
+//   }
+// );
 export const fetchProductsByStoreId = createAsyncThunk(
   "products/fetchProductsByStoreId",
-  async (storeId, { rejectWithValue }) => {
+  async ({ storeId, page = 0, size = 10, cursorId, cursorDate }, { rejectWithValue }) => {
     try {
       if (!storeId) throw new Error("Store ID is missing.");
-      const response = await fetchProductsByStoreIdAPI(storeId);
-      console.log(response);
       
-      return response.data || [];
+      const params = { page, size };
+      if (cursorId && cursorDate) {
+        params.cursorId = cursorId;
+        params.cursorDate = cursorDate;
+      }
+
+      const response = await axiosInstance.get(`/public/products/store/${storeId}`, {
+        params
+      });
+      
+      console.log(response.data.data.content);
+      
+      return {
+        products: response.data.data.content || [],
+        hasMore: !response.data.data.last,
+        page: response.data.data.number,
+        cursorId: response.data.content.length > 0 
+          ? response.data.content[response.data.content.length - 1].id 
+          : null,
+        cursorDate: response.data.content.length > 0
+          ? response.data.content[response.data.content.length - 1].createdAt
+          : null
+      };
+
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch products for this store.");
     }
@@ -269,8 +337,26 @@ const productSlice = createSlice({
     hasMore: true,
     bestSellingPage: 0,
     bestSellingHasMore: true,
+
+
+
+  storeProducts: [], 
+
+  storeProductsPage: 0,
+  storeProductsHasMore: true,
+  storeProductsCursorId: null,
+  storeProductsCursorDate: null,
+ 
   },
   reducers: {
+
+    resetStoreProducts: (state) => {
+      state.storeProducts = [];
+      state.storeProductsPage = 0;
+      state.storeProductsHasMore = true;
+      state.storeProductsCursorId = null;
+      state.storeProductsCursorDate = null;
+    },
     resetProducts: (state) => {
       state.products = [];
       state.page = 1;
@@ -279,6 +365,52 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+    .addCase(fetchProductsByStoreId.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(fetchProductsByStoreId.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      
+      // If it's the first page, replace the products
+      if (action.payload.page === 0) {
+        state.products = action.payload.products;
+      } else {
+        // Otherwise append to existing products
+        state.products = [...state.products, ...action.payload.products];
+      }
+      
+      state.hasMore = action.payload.hasMore;
+      state.page = action.payload.page + 1;
+      state.storeProductsCursorId = action.payload.cursorId;
+      state.storeProductsCursorDate = action.payload.cursorDate;
+    })
+    .addCase(fetchProductsByStoreId.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload;
+    })
+    .addCase(fetchStoreProducts.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(fetchStoreProducts.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      
+      // If it's the first page, replace the products
+      if (action.payload.page === 0) {
+        state.storeProducts = action.payload.products;
+      } else {
+        // Otherwise append to existing products
+        state.storeProducts = [...state.storeProducts, ...action.payload.products];
+      }
+      
+      state.storeProductsHasMore = action.payload.hasMore;
+      state.storeProductsPage = action.payload.page + 1;
+      state.storeProductsCursorId = action.payload.cursorId;
+      state.storeProductsCursorDate = action.payload.cursorDate;
+    })
+    .addCase(fetchStoreProducts.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload;
+    })
     .addCase(updateProduct.pending, (state) => {
       state.status = "loading";
     })
@@ -397,18 +529,6 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ✅ Fetch products by Store ID
-      .addCase(fetchProductsByStoreId.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchProductsByStoreId.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.products = action.payload;
-      })
-      .addCase(fetchProductsByStoreId.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
 
       // ✅ Create product
       .addCase(createProduct.fulfilled, (state, action) => {
@@ -476,5 +596,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { resetProducts } = productSlice.actions;
+export const { resetProducts ,resetStoreProducts } = productSlice.actions;
 export default productSlice.reducer;

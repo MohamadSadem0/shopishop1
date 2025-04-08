@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,42 +73,58 @@ public class AuthenticationService {
 
 
     public LoginResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        try {
+            // First check if the user exists and is enabled before attempting authentication
+            User user = userRepository.findByEmail(request.email())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ResourceNotFoundException("email"));
+            // Check if the account is activated
+            if (!user.isEnabled()) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account not activated. Please check your email for the activation link.");
+            }
 
-        // Check if the account is activated
-        if (!user.isEnabled()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account not activated. Please check your email for the activation link.");
-        }
+            try {
+                // Attempt authentication now that we know the user is enabled
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                );
+            } catch (BadCredentialsException e) {
+                // Handle invalid credentials
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+            }
 
-        String token = jwtService.generateToken(user);
+            String token = jwtService.generateToken(user);
 
-        StoreDetails storeDetails = null;
-        if (user.getUserRole() == UserRoleEnum.MERCHANT && user.getStore() != null) {
-            storeDetails = new StoreDetails(
-                    user.getStore().getId(),
-                    user.getStore().getName(),
-                    user.getStore().getSection().getName(),
-                    user.getStore().getAddress(),
-                    user.getStore().getDescription(),
-                    user.getStore().getImageUrl(),
-                    user.getStore().isApproved()
+            StoreDetails storeDetails = null;
+            if (user.getUserRole() == UserRoleEnum.MERCHANT && user.getStore() != null) {
+                storeDetails = new StoreDetails(
+                        user.getStore().getId(),
+                        user.getStore().getName(),
+                        user.getStore().getSection().getName(),
+                        user.getStore().getAddress(),
+                        user.getStore().getDescription(),
+                        user.getStore().getImageUrl(),
+                        user.getStore().isApproved()
+                );
+            }
+
+            return new LoginResponse(
+                    token,
+                    user.getName(),
+                    Optional.ofNullable(user.getPhoneNbr()).orElse(""),
+                    user.getEmail(),
+                    user.getProfilePictureUrl(),
+                    user.getUserRole().name(),
+                    storeDetails
             );
+        } catch (ResponseStatusException e) {
+            // Re-throw the already formatted exceptions
+            throw e;
+        } catch (Exception e) {
+            // Handle any other unexpected errors
+            log.error("Authentication error", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred during authentication");
         }
-
-        return new LoginResponse(
-                token,
-                user.getName(),
-                Optional.ofNullable(user.getPhoneNbr()).orElse(""),
-                user.getEmail(),
-                user.getProfilePictureUrl(),
-                user.getUserRole().name(),
-                storeDetails
-        );
     }
 
     public String confirmAccount(String token) {
@@ -161,7 +178,4 @@ public class AuthenticationService {
         userRepository.save(user);
         return "Password updated successfully.";
     }
-
-
-
 }
