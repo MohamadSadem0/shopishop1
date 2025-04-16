@@ -38,6 +38,7 @@ export const fetchStoreProducts = createAsyncThunk(
       const response = await axiosInstance.get(`/public/products/store/${storeId}`, {
         params
       });
+      console.log(response);
       
       return {
         products: response.data.content || [],
@@ -216,21 +217,26 @@ export const fetchProductsByStoreId = createAsyncThunk(
         params
       });
       
-      console.log(response.data.data.content);
+      // Log full response to help debug
+      console.log("Full API response:", response.data);
+      
+      // Get products array safely (with fallbacks)
+      const products = response.data?.data?.content || [];
+      console.log("Products array:", products);
+      
+      // Get last item safely for cursor
+      const lastProduct = products.length > 0 ? products[products.length - 1] : null;
       
       return {
-        products: response.data.data.content || [],
-        hasMore: !response.data.data.last,
-        page: response.data.data.number,
-        cursorId: response.data.content.length > 0 
-          ? response.data.content[response.data.content.length - 1].id 
-          : null,
-        cursorDate: response.data.content.length > 0
-          ? response.data.content[response.data.content.length - 1].createdAt
-          : null
+        products: products,
+        hasMore: response.data?.data?.last === false, // Ensure correct boolean
+        page: response.data?.data?.number || 0,
+        cursorId: lastProduct?.id || null,
+        cursorDate: lastProduct?.createdAt || null
       };
 
     } catch (error) {
+      console.error("API error:", error);
       return rejectWithValue(error.response?.data?.message || "Failed to fetch products for this store.");
     }
   }
@@ -373,14 +379,14 @@ const productSlice = createSlice({
       
       // If it's the first page, replace the products
       if (action.payload.page === 0) {
-        state.products = action.payload.products;
+        state.storeProducts = action.payload.products; // Update storeProducts, not products
       } else {
         // Otherwise append to existing products
-        state.products = [...state.products, ...action.payload.products];
+        state.storeProducts = [...state.storeProducts, ...action.payload.products]; // Update storeProducts
       }
       
-      state.hasMore = action.payload.hasMore;
-      state.page = action.payload.page + 1;
+      state.storeProductsHasMore = action.payload.hasMore; // Use storeProductsHasMore
+      state.storeProductsPage = action.payload.page + 1;  // Use storeProductsPage
       state.storeProductsCursorId = action.payload.cursorId;
       state.storeProductsCursorDate = action.payload.cursorDate;
     })

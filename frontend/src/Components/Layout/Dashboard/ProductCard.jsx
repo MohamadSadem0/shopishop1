@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaStar, FaRegStar, FaTimes, FaTag, FaInfoCircle } from "react-icons/fa";
 
 const ProductCard = ({ 
@@ -11,6 +11,10 @@ const ProductCard = ({
   isMerchant
 }) => {
   const [showDetails, setShowDetails] = useState(false);
+  useEffect(()=>{
+    console.log(product);
+    
+  },[])
 
   const toggleDetails = () => setShowDetails(!showDetails);
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchStoreProducts,
   fetchProductsByStoreId,
   deleteProduct,
   updateProduct,
@@ -88,7 +87,7 @@ const AllProducts = () => {
             size: 10
           })).unwrap();
         } else if (role === "CUSTOMER" || role === "ADMIN") {
-          await dispatch(fetchStoreProducts({ 
+          await dispatch(fetchProductsByStoreId({ 
             storeId: store?.storeId,
             size: 10
           })).unwrap();
@@ -126,7 +125,7 @@ const AllProducts = () => {
           size: 10
         })).unwrap();
       } else {
-        await dispatch(fetchStoreProducts({ 
+        await dispatch(fetchProductsByStoreId({ 
           storeId: store?.storeId,
           cursorId: storeProductsCursorId,
           cursorDate: storeProductsCursorDate,
