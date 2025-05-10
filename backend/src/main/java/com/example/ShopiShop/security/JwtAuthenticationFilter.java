@@ -21,22 +21,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
-    private static final List<String> PUBLIC_ENDPOINTS = List.of("/api/auth/login", "/api/auth/signup");
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/public/");
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String servletPath = request.getServletPath();
-
-        // Skip JWT validation for public endpoints
-        if (PUBLIC_ENDPOINTS.contains(servletPath)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response); // Continue without JWT validation
+            filterChain.doFilter(request, response);
             return;
         }
 
