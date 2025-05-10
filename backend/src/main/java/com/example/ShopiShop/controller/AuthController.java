@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/public/auth")
+    @RequestMapping("/public/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
