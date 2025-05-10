@@ -33,13 +33,11 @@ public class SecurityConfiguration {
        channel.anyRequest().requiresSecure())
                 .csrf(csrf-> csrf.disable())  // Disable CSRF since you are using JWT
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/", "/favicon.ico", "/favicon.png", "/public/**").permitAll()
+                                .requestMatchers( "/public/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/ws/**", "/confirm").permitAll()
                         .requestMatchers("/admin/**").hasAuthority(UserRoleEnum.SUPERADMIN.name())
                         .requestMatchers("/merchant/**").hasAuthority(UserRoleEnum.MERCHANT.name())
-//                        .requestMatchers("/customer/**").hasAnyAuthority(UserRoleEnum.CUSTOMER.name())
-//                        .requestMatchers("/customer/**").hasAnyAuthority(UserRoleEnum.MERCHANT.name())
                                 .requestMatchers("/customer/**")
                                 .hasAnyAuthority(UserRoleEnum.CUSTOMER.name(), UserRoleEnum.MERCHANT.name())
                                 .anyRequest().authenticated()
