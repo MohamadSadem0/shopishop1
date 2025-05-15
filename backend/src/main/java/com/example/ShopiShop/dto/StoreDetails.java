@@ -1,6 +1,6 @@
 package com.example.ShopiShop.dto;
 
-public record StoreDetails(
+public record   StoreDetails(
         Long storeId,
         String storeName,
         String sectionName,

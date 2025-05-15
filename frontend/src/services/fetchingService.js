@@ -140,7 +140,7 @@ export const fetchAllProductsAPI = async () => {
  */
 export const fetchProductByIdAPI = async (productId) => {
   try {
-    const response = await axiosInstance.get(`/public/product/${productId}`);
+    const response = await axiosInstance.get(`/public/products/${productId}`);
     return response.data; // Assuming response.data contains the product
   } catch (error) {
     console.error('Failed to fetch product:', error);
@@ -273,7 +273,7 @@ export const fetchAllSectionsAPI = async () => {
 
 export const fetchProductsBySectionAPI = async (sectionId) => {
   try {
-    const response = await axiosInstance.get(`/public/product/section/${sectionId}`);
+    const response = await axiosInstance.get(`/public/products/section/${sectionId}`);
     return response.data; // This is the array of products
   } catch (error) {
     console.error('Error fetching products by section:', error);

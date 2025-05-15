@@ -54,7 +54,7 @@ export const deleteProductAPI = async (productId) => {
       const token = getDecryptedToken();
       if (!token) throw new Error('Authentication token is not available.');
 
-      const response = await axiosInstance.delete(`/merchant/product/delete/${productId}`, {
+      const response = await axiosInstance.delete(`/merchant/products/delete/${productId}`, {
           headers: {
               Authorization: `Bearer ${token}`,
           },

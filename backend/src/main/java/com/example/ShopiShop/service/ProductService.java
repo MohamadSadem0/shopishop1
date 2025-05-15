@@ -74,6 +74,7 @@ public class ProductService {
         return mapToProductResponse(product);
     }
 
+
 //    public List<ProductResponse> getProductsByStoreId(Long storeId) {
 //        Store store = storeRepository.findById(storeId)
 //                .orElseThrow(() -> new ResourceNotFoundException("Store not found"));

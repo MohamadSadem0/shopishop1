@@ -15,28 +15,41 @@ const ProductPage = () => {
   const section = searchParams.get("section") || null;
 
   const { products, status, hasMore, page } = useSelector((state) => state.products);
-  const observer = useRef();
 
+  const observer = useRef();
+  const loadingRef = useRef(false);  // To track loading inside observer callback
+
+  // Update loadingRef whenever status changes
+  useEffect(() => {
+    loadingRef.current = status === "loading";
+  }, [status]);
+
+  // Reset products and fetch first page when category or section change
   useEffect(() => {
     dispatch(resetProducts());
-    // Pass both category and section to your fetch function
     dispatch(fetchPaginatedProducts({ page: 0, category, section }));
   }, [dispatch, category, section]);
 
+  // Last product ref for infinite scroll
   const lastProductRef = useCallback(
     (node) => {
-      if (status === "loading") return;
+      if (loadingRef.current) return; // Don't observe while loading
+
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !loadingRef.current // extra safety check
+        ) {
           dispatch(fetchPaginatedProducts({ page, category, section }));
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [status, hasMore, page, category, section, dispatch]
+    [hasMore, page, category, section, dispatch]
   );
 
   return (
@@ -51,11 +64,14 @@ const ProductPage = () => {
         className={styles.section}
       >
         <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-4 lg:gap-[25px] xl:grid-cols-5 xl:gap-[30px] mb-12 border-0 mt-12">
-          {products.map((item, index) => (
-            <div ref={products.length === index + 1 ? lastProductRef : null} key={index}>
-              <Product data={item} />
-            </div>
-          ))}
+          {products.map((item, index) => {
+            const isLast = index === products.length - 1;
+            return (
+              <div ref={isLast ? lastProductRef : null} key={item.id}>
+                <Product data={item} />
+              </div>
+            );
+          })}
         </div>
 
         {status === "loading" && <p className="text-center text-gray-600">Loading...</p>}

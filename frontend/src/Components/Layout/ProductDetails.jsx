@@ -16,6 +16,7 @@ import ProductDetailsInfo from "./ProductDetailsInfo.jsx";
 import styles from "../../Styles/Style";
 
 const ProductDetails = ({ data }) => {
+  
   const dispatch = useDispatch();
   const { wishlist } = useSelector((state) => state.wishlist);
   const [count, setCount] = useState(1);
@@ -23,6 +24,8 @@ const ProductDetails = ({ data }) => {
 
   useEffect(() => {
     if (!data) return;
+    console.log(data);
+    
     setIsInWishlist(wishlist?.some((item) => item.id === data.id));
   }, [wishlist, data]);
 
@@ -45,7 +48,8 @@ const ProductDetails = ({ data }) => {
     }
     return data.discountName || "Special Offer";
   };
-
+            const price = Number(data.price) || 0;
+const discountedPrice = Number(data.discountedPrice);
   const incrementCount = () => {
     if (data?.quantity && count >= data.quantity) {
       toast.error("You cannot add more than the available quantity!");
@@ -193,23 +197,26 @@ const ProductDetails = ({ data }) => {
 
               {/* Price Display */}
               <div className="flex items-center mt-4 gap-3">
-                {data.hasActiveDiscount && isDiscountValid() && data.discountedPrice ? (
-                  <>
-                    <h4 className={styles.productDiscountPrice}>
-                      ${data.discountedPrice.toFixed(2)}
-                    </h4>
-                    <h3 className={styles.price}>
-                      ${data.price.toFixed(2)}
-                    </h3>
-                    <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                      {formatDiscount()}
-                    </span>
-                  </>
-                ) : (
-                  <h4 className={styles.productDiscountPrice}>
-                    ${data.price.toFixed(2)}
-                  </h4>
-                )}
+
+
+{data.hasActiveDiscount && isDiscountValid() && discountedPrice ? (
+  <>
+    <h4 className={styles.productDiscountPrice}>
+      ${discountedPrice.toFixed(2)}
+    </h4>
+    <h3 className={styles.price}>
+      ${price.toFixed(2)}
+    </h3>
+    <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+      {formatDiscount()}
+    </span>
+  </>
+) : (
+  <h4 className={styles.productDiscountPrice}>
+    ${price.toFixed(2)}
+  </h4>
+)}
+
               </div>
 
               {/* Discount Details */}

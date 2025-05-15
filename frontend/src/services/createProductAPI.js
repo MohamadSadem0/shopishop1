@@ -33,7 +33,7 @@ export const createProductAPI = async (productData,token) => {
     try {
       if (!token) throw new Error('No token found');
 
-      const response = await axiosInstance.post(`/merchant/product/create`, productData, {
+      const response = await axiosInstance.post(`/merchant/products/create`, productData, {
         headers: {
           Authorization: `Bearer ${token}`, // Add the JWT token to the request header
         },

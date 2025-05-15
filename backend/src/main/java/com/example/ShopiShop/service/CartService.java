@@ -21,12 +21,13 @@ import java.util.UUID;
 public class CartService {
 
     private final CartItemRepository cartItemRepository;
-    private  DiscountService discountService;
+    private final DiscountService discountService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    public CartService(CartItemRepository cartItemRepository, UserRepository userRepository, ProductRepository productRepository) {
+    public CartService(CartItemRepository cartItemRepository, DiscountService discountService, UserRepository userRepository, ProductRepository productRepository) {
         this.cartItemRepository = cartItemRepository;
+        this.discountService = discountService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
     }

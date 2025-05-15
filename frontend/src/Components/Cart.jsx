@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import axios from "../utils/axiosInstance1";
+import axios from "../utils/axiosInstance1"; // your axios instance
 import { toast } from "react-toastify";
 import { RxCross1 } from "react-icons/rx";
 import { Link } from "react-router-dom";
@@ -12,19 +12,32 @@ function Cart({ setOpenCart }) {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Get token & role from Redux store
   const { token, role } = useSelector((state) => state.auth);
+
   const canCheckout = token && (role === "CUSTOMER" || role === "MERCHANT");
 
   useEffect(() => {
+    if (!token) {
+      setError("You need to be logged in to view the cart.");
+      setLoading(false);
+      return;
+    }
     fetchCartFromBackend();
-  }, []);
+  }, [token]);
 
   const fetchCartFromBackend = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/customer/cart/all");
+      const response = await axios.get("/customer/cart/all", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setCartItems(response.data || []);
       setLoading(false);
+      setError(null);
     } catch (err) {
       console.error(err);
       setError("Failed to load cart");
@@ -34,7 +47,11 @@ function Cart({ setOpenCart }) {
 
   const handleRemoveItem = async (productId) => {
     try {
-      await axios.delete(`/customer/cart/remove/${productId}`);
+      await axios.delete(`/customer/cart/remove/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       toast.success("Item removed from cart!");
       fetchCartFromBackend();
     } catch (err) {
@@ -44,16 +61,23 @@ function Cart({ setOpenCart }) {
   };
 
   const handleIncrement = async (item) => {
-    // Validate against availableQuantity from the API
     if (item.quantity >= item.availableQuantity) {
       toast.error("Reached available stock limit!");
       return;
     }
     try {
-      await axios.post("/customer/cart/add", {
-        productId: item.productId,
-        quantity: 1,
-      });
+      await axios.post(
+        "/customer/cart/add",
+        {
+          productId: item.productId,
+          quantity: 1,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       fetchCartFromBackend();
     } catch (err) {
       console.error(err);
@@ -67,10 +91,18 @@ function Cart({ setOpenCart }) {
       return;
     }
     try {
-      await axios.post("/customer/cart/add", {
-        productId: item.productId,
-        quantity: -1,
-      });
+      await axios.post(
+        "/customer/cart/add",
+        {
+          productId: item.productId,
+          quantity: -1,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       fetchCartFromBackend();
     } catch (err) {
       toast.error("Failed to decrement item");
@@ -97,12 +129,6 @@ function Cart({ setOpenCart }) {
         ) : error ? (
           <div className="flex flex-col items-center justify-center p-4">
             <p className="text-red-500">{error}</p>
-            <button
-              onClick={fetchCartFromBackend}
-              className="bg-blue-500 text-white p-2 mt-2 rounded"
-            >
-              Retry
-            </button>
           </div>
         ) : cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-screen">

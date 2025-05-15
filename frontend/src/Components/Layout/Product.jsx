@@ -16,6 +16,12 @@ import styles from "../../Styles/Style";
 import { removeFromWishlist, addToWishlist } from "../../redux/WishlistAction";
 import axios from "../../utils/axiosInstance1";
 
+// Define DiscountType equivalent for frontend
+const DiscountType = {
+  PERCENTAGE: "PERCENTAGE",
+  FIXED_AMOUNT: "FIXED_AMOUNT",
+};
+
 const Product = ({ data }) => {
   const dispatch = useDispatch();
   const { wishlist } = useSelector((state) => state.wishlist);
@@ -29,9 +35,7 @@ const Product = ({ data }) => {
 
   const handleWishlistToggle = () => {
     setClick(!click);
-    click
-      ? dispatch(removeFromWishlist(data))
-      : dispatch(addToWishlist(data));
+    click ? dispatch(removeFromWishlist(data)) : dispatch(addToWishlist(data));
   };
 
   const handleAddToCart = async () => {
@@ -50,17 +54,23 @@ const Product = ({ data }) => {
 
   if (!data) return null;
 
+  // Parse numbers safely
+  const originalPrice = Number(data.originalPrice) || 0;
+  const finalPrice = Number(data.finalPrice) || originalPrice;
+  const discountValue = Number(data.discountValue) || 0;
+
   // Calculate discount percentage if available
-  const discountPercentage = data.discountValue && data.discountInfo?.discountType === DiscountType.PERCENTAGE
-    ? data.discountValue
-    : data.discountValue && data.originalPrice.compareTo(BigDecimal.ZERO) > 0
-      ? data.discountValue.divide(data.originalPrice, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
+  const discountPercentage =
+    discountValue && data.discountInfo?.discountType === DiscountType.PERCENTAGE
+      ? discountValue
+      : discountValue && originalPrice > 0
+      ? ((discountValue / originalPrice) * 100).toFixed(2)
       : null;
 
   return (
     <div className="bg-white rounded-lg shadow-sm w-full h-[370px] relative p-3 cursor-pointer">
       {/* Discount badge */}
-      {data.discountValue && (
+      {discountValue > 0 && (
         <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
           {discountPercentage}% OFF
         </div>
@@ -83,7 +93,7 @@ const Product = ({ data }) => {
         </h4>
         <div className="flex select-none items-center">
           <span className="mr-2 font-bold">Rating:</span>
-          {[...Array(5)].map((_, i) => (
+          {[...Array(5)].map((_, i) =>
             i < Math.floor(data.averageRating || 0) ? (
               <AiFillStar
                 key={i}
@@ -99,7 +109,7 @@ const Product = ({ data }) => {
                 className="mr-1 cursor-pointer"
               />
             )
-          ))}
+          )}
           <span className="text-sm text-gray-500 ml-1">
             ({data.reviews?.length || 0})
           </span>
@@ -107,18 +117,18 @@ const Product = ({ data }) => {
       </Link>
 
       <div className="py-2 flex flex-col select-none">
-        {data.finalPrice.compareTo(data.originalPrice) < 0 ? (
+        {finalPrice < originalPrice ? (
           <>
             <div className="flex items-center">
               <span className="font-bold mr-1">Price:</span>
               <span className={styles.productDiscountPrice}>
-                ${data.finalPrice.toFixed(2)}
+                ${finalPrice.toFixed(2)}
               </span>
             </div>
             <div className="flex items-center">
               <span className="font-bold mr-1">Original:</span>
               <span className="line-through text-gray-500">
-                ${data.originalPrice.toFixed(2)}
+                ${originalPrice.toFixed(2)}
               </span>
             </div>
           </>
@@ -126,7 +136,7 @@ const Product = ({ data }) => {
           <div className="flex items-center">
             <span className="font-bold mr-1">Price:</span>
             <span className={styles.productDiscountPrice}>
-              ${data.originalPrice.toFixed(2)}
+              ${originalPrice.toFixed(2)}
             </span>
           </div>
         )}
@@ -167,9 +177,9 @@ const Product = ({ data }) => {
           disabled={data.quantity <= 0}
           aria-label="Add to cart"
         >
-          <AiOutlineShoppingCart 
-            size={25} 
-            color={data.quantity <= 0 ? "#ccc" : "#333"} 
+          <AiOutlineShoppingCart
+            size={25}
+            color={data.quantity <= 0 ? "#ccc" : "#333"}
           />
         </button>
 

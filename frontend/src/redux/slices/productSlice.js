@@ -10,7 +10,7 @@ export const fetchBestSellingProducts = createAsyncThunk(
   "products/fetchBestSellingProducts",
   async ({ page = 0, size = 10 }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/public/product/best-selling", {
+      const response = await axiosInstance.get("/public/products/best-selling", {
         params: { page, size },
       });
       // The API returns: { success, message, data: Page<ProductResponse> }
@@ -38,7 +38,6 @@ export const fetchStoreProducts = createAsyncThunk(
       const response = await axiosInstance.get(`/public/products/store/${storeId}`, {
         params
       });
-      console.log(response);
       
       return {
         products: response.data.content || [],
@@ -67,7 +66,7 @@ export const removeDiscount = createAsyncThunk(
       if (!token) throw new Error("Authentication token is missing.");
       
       const response = await axiosInstance.delete(
-        `/merchant/product/remove-discount/${productId}`,
+        `/merchant/products/remove-discount/${productId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -88,9 +87,9 @@ export const fetchBestDeals = createAsyncThunk(
   "products/fetchBestDeals",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/public/product/best-deals");
-      // The data may be wrapped in { success, message, data } => adapt as needed
-      return response.data.data; 
+      const response = await axiosInstance.get("/public/products/best-deals");
+      // Check if response.data has 'data' or directly array
+      return response.data.data || response.data || [];
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch best deals."
@@ -99,6 +98,7 @@ export const fetchBestDeals = createAsyncThunk(
   }
 );
 
+
 // ------------------------------
 // 2) Featured Products Thunk
 // ------------------------------
@@ -106,7 +106,7 @@ export const fetchFeaturedProducts = createAsyncThunk(
   "products/fetchFeaturedProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/public/product/featured");
+      const response = await axiosInstance.get("/public/products/featured");
       return response.data.data;
     } catch (error) {
       return rejectWithValue(
@@ -150,7 +150,7 @@ export const updateProduct = createAsyncThunk(
       if (!token) throw new Error("Authentication token is missing.");
       // Call the backend update endpoint
       const response = await axiosInstance.put(
-        `/merchant/product/update/${productId}`,
+        `/merchant/products/update/${productId}`,
         productData,
         {
           headers: {
@@ -172,19 +172,19 @@ export const fetchPaginatedProducts = createAsyncThunk(
   async ({ page, category }, { rejectWithValue }) => {
     try {
       const response = await fetchPaginatedProductsAPI(page, 10, category);
-
-      console.log(response);
+      console.log("API response:", response);
       
       return {
-        products: response.content || [],  // ✅ Extract `content`
-        hasMore: !response.last, // ✅ Check if there are more pages
-        page: response.number + 1, // ✅ Update the page number
+        products: response || [],
+        hasMore: !response.last,
+        page: response.number,  // zero-based page number from API
       };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch products.");
     }
   }
 );
+
 
 // // ✅ Fetch products by Store ID (For merchants)
 // export const fetchProductsByStoreId = createAsyncThunk(
@@ -218,11 +218,9 @@ export const fetchProductsByStoreId = createAsyncThunk(
       });
       
       // Log full response to help debug
-      console.log("Full API response:", response.data);
       
       // Get products array safely (with fallbacks)
       const products = response.data?.data?.content || [];
-      console.log("Products array:", products);
       
       // Get last item safely for cursor
       const lastProduct = products.length > 0 ? products[products.length - 1] : null;
@@ -278,13 +276,12 @@ export const deleteProduct = createAsyncThunk(
 export const applyDiscount = createAsyncThunk(
   "products/applyDiscount",
   async ({ productId, discountData }, { getState, rejectWithValue }) => {
-    console.log(discountData);
     
     try {
       const { token } = getState().auth || {};
       if (!token) throw new Error("Authentication token is missing.");
       const response = await axiosInstance.post(
-        `/merchant/product/apply-discount/${productId}`,
+        `/merchant/products/apply-discount/${productId}`,
         discountData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -307,11 +304,10 @@ export const updateProductQuantity = createAsyncThunk(
   async ({ productId, quantity }, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      console.log(productId);
       
       if (!token) throw new Error("Authentication token is missing.");
       const response = await axiosInstance.put(
-        `/merchant/product/update-quantity/${productId}`,
+        `/merchant/products/update-quantity/${productId}`,
         { quantity:quantity },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -339,7 +335,7 @@ const productSlice = createSlice({
     selectedProduct: null,
     status: "idle",
     error: null,
-    page: 1,
+    page: 0,
     hasMore: true,
     bestSellingPage: 0,
     bestSellingHasMore: true,
@@ -365,7 +361,7 @@ const productSlice = createSlice({
     },
     resetProducts: (state) => {
       state.products = [];
-      state.page = 1;
+      state.page = 0;
       state.hasMore = true;
     },
   },
@@ -511,12 +507,30 @@ const productSlice = createSlice({
       .addCase(fetchPaginatedProducts.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchPaginatedProducts.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.products = [...state.products, ...action.payload.products]; // ✅ Append new products
-        state.hasMore = action.payload.hasMore; // ✅ Check if more products exist
-        state.page += 1;
-      })
+.addCase(fetchPaginatedProducts.fulfilled, (state, action) => {
+  state.status = "succeeded";
+
+  // Create a Map to keep unique products by id
+  const productsMap = new Map();
+
+  // First add existing products
+  state.products.forEach(p => {
+    productsMap.set(p.id, p);
+  });
+
+  // Then add new products, overwrite if duplicate
+  action.payload.products.forEach(p => {
+    productsMap.set(p.id, p);
+  });
+
+  // Set unique products back to state
+  state.products = Array.from(productsMap.values());
+
+  state.hasMore = action.payload.hasMore;
+  state.page += 1;
+})
+
+
       .addCase(fetchPaginatedProducts.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
