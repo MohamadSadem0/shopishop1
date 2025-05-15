@@ -367,11 +367,61 @@ const AllProducts = () => {
   ];
 
   const updateFields = [
-    // ... (same as before)
+    {
+      label: "Product Name",
+      name: "name",
+      type: "text",
+      placeholder: "Enter product name",
+      value: updateData.name,
+      onChange: (e) => setUpdateData({ ...updateData, name: e.target.value }),
+      required: true
+    },
+    {
+      label: "Description",
+      name: "description",
+      type: "textarea",
+      placeholder: "Enter product description",
+      value: updateData.description,
+      onChange: (e) => setUpdateData({ ...updateData, description: e.target.value }),
+      required: true
+    },
+    {
+      label: "Price ($)",
+      name: "price",
+      type: "number",
+      placeholder: "Enter product price",
+      value: updateData.price,
+      onChange: (e) => setUpdateData({ ...updateData, price: e.target.value }),
+      required: true,
+      min: 0.01,
+      step: "0.01"
+    },
+    {
+      label: "Image",
+      name: "imageUrl",
+      type: "file",
+      onChange: handleFileChange,
+      accept: "image/*",
+      disabled: imageUploading
+    },
+    {
+      label: "Category",
+      name: "categoryName",
+      type: "text",
+      placeholder: "Enter product category",
+      value: updateData.categoryName,
+      onChange: (e) => setUpdateData({ ...updateData, categoryName: e.target.value }),
+      required: true
+    }
   ];
 
-  const quantityFields = [
-    // ... (same as before)
+  const quantityFields = [{
+   label: "New Quantity", type: "number",
+      placeholder: "Enter new quantity",
+      value: quantityData.quantity,
+            onChange: (e) => setQuantityData({ ...quantityData, quantity: e.target.value }),
+required: true,  min: 0,
+    }
   ];
 
   // Determine which products to display based on role

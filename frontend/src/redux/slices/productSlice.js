@@ -148,9 +148,9 @@ export const updateProduct = createAsyncThunk(
     try {
       const { token } = getState().auth;
       if (!token) throw new Error("Authentication token is missing.");
-      // Call the backend update endpoint
+      // Corrected endpoint URL without '/update'
       const response = await axiosInstance.put(
-        `/merchant/products/update/${productId}`,
+        `/merchant/products/${productId}`, 
         productData,
         {
           headers: {
@@ -158,14 +158,13 @@ export const updateProduct = createAsyncThunk(
           },
         }
       );
-      return response.data.data; // the updated product
+      return response.data.data; // updated product
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update product."
-      );
+      return rejectWithValue(error.response?.data?.message || "Failed to update product.");
     }
   }
 );
+;
 
 export const fetchPaginatedProducts = createAsyncThunk(
   "products/fetchPaginatedProducts",
@@ -276,12 +275,12 @@ export const deleteProduct = createAsyncThunk(
 export const applyDiscount = createAsyncThunk(
   "products/applyDiscount",
   async ({ productId, discountData }, { getState, rejectWithValue }) => {
-    
     try {
       const { token } = getState().auth || {};
       if (!token) throw new Error("Authentication token is missing.");
+      // Corrected endpoint URL to match backend mapping
       const response = await axiosInstance.post(
-        `/merchant/products/apply-discount/${productId}`,
+        `/merchant/products/${productId}/discounts`,
         discountData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -289,40 +288,35 @@ export const applyDiscount = createAsyncThunk(
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to apply discount."
-      );
+      return rejectWithValue(error.response?.data?.message || "Failed to apply discount.");
     }
   }
 );
 
+
 // ... other thunks such as fetchBestSellingProducts, fetchBestDeals, etc.
 
-// NEW: Thunk to update product quantity (only available to the store owner)
 export const updateProductQuantity = createAsyncThunk(
   "products/updateProductQuantity",
   async ({ productId, quantity }, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      
       if (!token) throw new Error("Authentication token is missing.");
+      // Corrected endpoint URL to match backend mapping
       const response = await axiosInstance.put(
-        `/merchant/products/update-quantity/${productId}`,
-        { quantity:quantity },
+        `/merchant/products/${productId}/quantity`,
+        { quantity },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      return response.data.data; // The updated product
+      return response.data.data; // updated product with new quantity
     } catch (error) {
-      console.log(error);
-      
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update product quantity."
-      );
+      return rejectWithValue(error.response?.data?.message || "Failed to update product quantity.");
     }
   }
 );
+
 
 
 const productSlice = createSlice({
